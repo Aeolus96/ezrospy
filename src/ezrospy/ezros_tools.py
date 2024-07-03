@@ -11,15 +11,16 @@ EzRosPy Tooling:
 
 import os
 import signal
+import socket
 import subprocess
 import time
 from math import asin, atan2, cos, degrees, radians, sin, sqrt
 from threading import Thread
 
-import rospy
 import rospkg
+import rospy
 import yaml
-import socket
+from munch import Munch, munchify, unmunchify
 
 # End of Imports ------------------------------------------------------------------------------------------------------
 
@@ -175,54 +176,35 @@ class ScriptPlayer:
     # End of class ----------------------------------------------------------------------------------------------------
 
 
-class YAMLReader:
-    """Read YAML files and store the data in an attribute style access object. This only reads at instance creation."""
+class YAMLReader(Munch):
+    """Read YAML files and store the data in an attribute style access object."""
 
-    def __init__(self, file_path: str = None) -> None:
-        """Initialize the YAML Reader using the .yaml file path. Use full path."""
+    def __init__(self, file_path):
+        """Initialize the YAML Reader"""
+        super().__init__()
+        self.read(file_path)  # Automatically read YAML data on initialization
 
+    def read(self, file_path=None):
+        """Read YAML data from file and munchify it"""
         if file_path is None:
             raise ValueError("YAML: No file path provided")
         try:
             with open(file_path, "r") as file:
-                print(f"YAML loaded: {file_path}")
-                data = yaml.safe_load(file)
-                if data:
-                    self._update_attributes(data)
+                print(f"YAML: Loading file '{file_path}'")
+                self.update(munchify(yaml.safe_load(file)))
         except Exception as e:
-            print(f"YAML: Failed to load file: {e}")
+            print(f"YAML: Failed to load file '{file_path}': {e}")
 
-    def _update_attributes(self, data) -> None:
-        """Update the class instance attributes with the data from the YAML file"""
-
-        for key, value in data.items():
-            setattr(self, key, value)
-
-    def write(self, file_path=None) -> None:
-        """Write the instance attributes to a YAML file"""
-
+    def write(self, file_path=None):
+        """Write the YAML data to a file"""
         if file_path is None:
             raise ValueError("YAML: No file path provided")
-        data = {key: value for key, value in self.__dict__.items() if not key.startswith("_")}
         try:
             with open(file_path, "w") as file:
-                yaml.safe_dump(data, file)
-                print(f"YAML written: {file_path}")
+                yaml.safe_dump(unmunchify(self), file)
+                print(f"YAML: File successfully written to '{file_path}'")
         except Exception as e:
-            print(f"YAML: Failed to write file: {e}")
-
-    def __getattr__(self, name) -> None:
-        """If attribute is not found, return None"""
-
-        return None
-
-    def __setattr__(self, name, value) -> None:
-        """Set attribute if it is not a private attribute"""
-
-        if name.startswith("_") or name in self.__dict__:
-            super().__setattr__(name, value)
-        else:
-            self.__dict__[name] = value
+            print(f"YAML: Failed to write file '{file_path}': {e}")
 
     # End of class ----------------------------------------------------------------------------------------------------
 
@@ -323,11 +305,12 @@ class EzRosNode:
         rospy.loginfo(f"{self.name} is shutting down")
 
     def load_config(self) -> None:
-        """Loads robot configuration from YAML file"""
+        """Loads configuration from YAML file"""
 
         config_parameters = YAMLReader(self.config_file_path)
         for key, value in config_parameters.items():
             setattr(self, key, value)
+        self.namespace = getattr(config_parameters, "namespace", "")  # Default namespace is relative unless specified
 
     def initialize_publishers(self) -> None:
         """Initializes publishers as described in YAML file @ config_file_path"""
@@ -335,6 +318,8 @@ class EzRosNode:
         for publisher in self.publishers:
             exec(f"from {publisher.msg_file} import {publisher.msg_type}")
             topic = str(publisher.topic)
+            if not topic.startswith("/"):  # Add namespace if topic is not absolute
+                topic = self.namespace + topic
             msg = eval(publisher.msg_type)
             temp_publisher = rospy.Publisher(topic, msg, queue_size=1)
             setattr(self, publisher.name, temp_publisher)  # publisher.name is defined in the YAML file
@@ -345,9 +330,13 @@ class EzRosNode:
         for subscriber in self.subscribers:
             exec(f"from {subscriber.msg_file} import {subscriber.msg_type}")
             topic = str(subscriber.topic)
+            if topic.startswith("/"):  # Add namespace if topic is not absolute
+                name = f"msg{subscriber.topic.replace('/', '_')}"  # Absolute topic name
+            else:
+                name = f"msg{subscriber.topic.replace('/', '_')}"  # Relative topic name
+                topic = self.namespace + topic
             msg = eval(subscriber.msg_type)
             msg_instance = msg()
-            name = f"msg{subscriber.topic.replace('/', '_')}"  # Replace slashes with underscores
             setattr(self, name, msg_instance)  # Initialize the instance attributes with default message objects
             rospy.Subscriber(topic, msg, callback=self.any_callback, callback_args=name, queue_size=1)
 
