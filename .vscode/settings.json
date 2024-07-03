@@ -1,0 +1,17 @@
+{
+    "python.analysis.typeCheckingMode": "off",
+    "python.autoComplete.extraPaths": [
+        "/opt/ros/noetic/lib/python3/dist-packages",
+        "./src/ezrospy"
+    ],
+    "python.analysis.extraPaths": [
+        "/opt/ros/noetic/lib/python3/dist-packages",
+        "./src/ezrospy"
+    ],
+    "cSpell.words": [
+        "ezros",
+        "ezrospy",
+        "iframe",
+        "rosboard"
+    ]
+}
