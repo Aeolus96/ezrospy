@@ -1,0 +1,19 @@
+namespace: ezros_robot
+
+publishers:
+  - name: pub1
+    topic: /test/pub1
+    msg_file: geometry_msgs.msg
+    msg_type: Twist
+  - name: pub2
+    topic: test/pub2
+    msg_file: std_msgs.msg
+    msg_type: String
+
+subscribers:
+  - topic: /test/sub1
+    msg_file: std_msgs.msg
+    msg_type: Bool
+  - topic: test/sub2
+    msg_file: std_msgs.msg
+    msg_type: Float32

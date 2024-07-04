@@ -299,9 +299,13 @@ class EzRosNode:
         self.thread.start()
 
     def __del__(self):
+        """Destructor for ROS node"""
+
         rospy.signal_shutdown(f"{self.name} destructor called")
 
     def shutdown_hook(self):
+        """Shutdown hook for ROS node"""
+
         rospy.loginfo(f"{self.name} is shutting down")
 
     def load_config(self) -> None:

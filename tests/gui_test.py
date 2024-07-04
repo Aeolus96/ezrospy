@@ -10,19 +10,6 @@ ui.add_css("""
     }
 """)
 
-# https://www.gradient-animator.com/
-
-# Purple Pink:
-# background: linear-gradient(270deg, #d630ea, #ea30a1, #7930ea);
-# Blue:
-# background: linear-gradient(45deg, #1a2980, #26d0ce);
-# Red Orange:
-# background: linear-gradient(270deg, #ea8430, #d92020);
-# Purple Peach:
-# background: linear-gradient(43deg, #FFCC70, #C850C0, #4158D0);
-# Dark Theme:
-# background: linear-gradient(270deg, #4b79a1, #283e51);
-
 background = """
     background: linear-gradient(270deg, #ea8430, #d92020);
     background-size: 600% 600%;
@@ -31,7 +18,6 @@ background = """
     -moz-animation: AnimationName 59s ease infinite;
     animation: AnimationName 59s ease infinite;
 """
-
 gradient = """
     @-webkit-keyframes AnimationName {
         0%{background-position:0% 50%}
@@ -57,20 +43,18 @@ gradient = """
 
 
 # GUI Page Setup ------------------------------------------------------------------------------------------------------
-@ui.page("/", title="EzRosPy UI")
+@ui.page("/", title="EzRosPy UI")  # Set the page title and path
 def index():
-    # Set background color
-    # ui.query("body").classes("bg-gradient-to-r from-rose-700 to-orange-500")
-    ui.query("body").style(f"{background}")
-    ui.add_css(f"{gradient}")
+    ui.query("body").style(f"{background}")  # Set the background
+    ui.add_css(f"{gradient}")  # Animate the background
 
-    def handle_key(e: KeyEventArguments):
+    def handle_playback_key(e: KeyEventArguments):  # Handle keyboard events for playback
         if e.modifiers.shift and e.key.enter and e.action.keydown:
-            ui.notify("playing")
+            ui.notify("playing")  # Link to button later
 
-    keyboard = ui.keyboard(on_key=handle_key, active=True)
+    ui.keyboard(on_key=handle_playback_key, active=True)
 
-    # Overall Card ----------------------------------------------------------------------------------------------------
+    # Main Card -------------------------------------------------------------------------------------------------------
     with ui.card().tight() as page_card:
         page_card.classes("rounded-xl shadow-lg shadow-black bg-white/30")
         page_card.style(
