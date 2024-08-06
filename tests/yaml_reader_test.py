@@ -34,6 +34,8 @@ class YAMLReader(Munch):
         except Exception as e:
             print(f"YAML: Failed to write file '{file_path}': {e}")
 
+    # End of class ----------------------------------------------------------------------------------------------------
+
 
 def test_yaml_reader():
     yaml_file = "test.yaml"

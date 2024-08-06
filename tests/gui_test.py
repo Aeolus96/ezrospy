@@ -1,7 +1,6 @@
 from nicegui import ui
 from nicegui.events import KeyEventArguments
 
-
 # Change some defaults for NiceGUI ------------------------------------------------------------------------------------
 ui.add_css("""
     :root {
@@ -87,9 +86,9 @@ def index():
             with vertical_splitter.before:
                 # iframe = ui.element("iframe").style("width:100%; height:100%;")
                 # iframe._props["src"] = "http://127.0.0.1:8889/"
-                with ui.link(
-                    target="https://github.com/Aeolus96/actor_ros/blob/main/scripts/actor_gui.py", new_tab=True
-                ).classes("absolute right-0 top-0"):
+                with ui.link(target="https://github.com/Aeolus96/ezrospy", new_tab=True).classes(
+                    "absolute right-0 top-0"
+                ):
                     ui.button(icon="open_in_new").props("color=dark flat square").classes("w-14 h-14")
 
             # Right Side - Script Output --------------------------------------
@@ -97,5 +96,7 @@ def index():
                 with ui.card_section().classes("w-full h-full bg-black/10 rounded-br-xl"):
                     scrolling_log_area = ui.scroll_area().classes("w-full h-full gap-0 show-scrollbar overflow-y-auto")
 
+
+print("\nEzRosPy UI: Please test the UI manually. Press Ctrl+C to exit\n")
 
 ui.run(show=False, port=8889)

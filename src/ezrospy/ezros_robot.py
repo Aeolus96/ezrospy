@@ -18,7 +18,7 @@ from ezrospy import ezros_tools as ezros_tools
 class EzRobot(ezros_tools.EzRosNode):
     """Class for a simplistic robot and related operations"""
 
-    def __init__(self, name: str = "Robot", config_file_path: str = None) -> None:
+    def __init__(self, name: str = "EzRobot", config_file_path: str = None) -> None:
         """Initializes robot, publishers and subscribers"""
 
         super().__init__(name, config_file_path)

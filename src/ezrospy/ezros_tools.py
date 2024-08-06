@@ -5,7 +5,7 @@ EzRosPy Tooling:
     - Python Script Player
     - YAML I/O
     - GPS Waypoint Utilities
-    - ROS Node Lifecycle Manager
+    - ROS Node Handler
 
 --------------------------------------------------------------------------------------------------------------------"""
 
@@ -143,7 +143,7 @@ class ScriptPlayer:
             print(f"---------------- Exception in read_output ----------------\n{e}")
             self.process_is_running = False
 
-    def stop_script(self, timeout: float = 1.0) -> str:
+    def stop_script(self, timeout: float = 0.25) -> str:
         """Stop the currently running script"""
 
         terminate_text = """
@@ -287,7 +287,7 @@ class EzRosNode:
     """Custom ROS Tooling that simplifies setup and scripting for ROS nodes.\n
     NOTICE: Only one instance of this class should be created per python script."""
 
-    def __init__(self, name: str = "EzRosNode", config_file_path: str = None):
+    def __init__(self, name: str = "EzRosNode", config_file_path: str = None, verbose: bool = False):
         """Initializes ROS node, makes publishers and subscribers as described in YAML file @ config_file_path.\n
         IMPORTANT: Full path from root is required!\n
         NOTICE: Only one instance of this class should be created per python script"""
@@ -297,13 +297,9 @@ class EzRosNode:
 
         self.name = name
         self.config_file_path = config_file_path
-        if self.load_config():
+        self.verbose = verbose
+        if self._load_config():
             self._run_node()
-
-    def _shutdown_hook(self):
-        """Shutdown hook for ROS node"""
-
-        self.print_title(f"{self.name} is shutting down")
 
     def _load_config(self) -> bool:
         """Loads configuration from YAML file"""
@@ -314,6 +310,9 @@ class EzRosNode:
                 setattr(self, key, value)
             # Default namespace is relative unless specified
             self.namespace = getattr(config_parameters, "namespace", "")
+            if self.verbose:
+                print(f"{self.name}: Loaded config file '{self.config_file_path}'")
+                print(f"{self.name}: Namespace is '{self.namespace}'")
             return True
         except Exception as e:
             print(f"{self.name}: {e}")
@@ -330,6 +329,8 @@ class EzRosNode:
             msg = eval(publisher.msg_type)
             temp_publisher = rospy.Publisher(topic, msg, queue_size=1)
             setattr(self, publisher.name, temp_publisher)  # publisher.name is defined in the YAML file
+            if self.verbose:
+                print(f"{self.name}: Initialized publisher '{publisher.name}' on topic '{topic}'")
 
     def _initialize_subscribers(self) -> None:
         """Initializes subscribers as described in YAML file @ config_file_path"""
@@ -338,26 +339,33 @@ class EzRosNode:
             exec(f"from {subscriber.msg_file} import {subscriber.msg_type}")
             topic = str(subscriber.topic)
             if topic.startswith("/"):  # Add namespace if topic is not absolute
-                name = f"msg{subscriber.topic.replace('/', '_')}"  # Absolute topic name
+                name = f"msg_{subscriber.topic.replace('/', '_')}"  # Absolute topic name
             else:
-                name = f"msg{subscriber.topic.replace('/', '_')}"  # Relative topic name
+                name = f"msg_{subscriber.topic.replace('/', '_')}"  # Relative topic name
                 topic = (self.namespace if self.namespace.endswith("/") else self.namespace + "/") + topic
             msg = eval(subscriber.msg_type)
             msg_instance = msg()
             setattr(self, name, msg_instance)  # Initialize the instance attributes with default message objects
             rospy.Subscriber(topic, msg, callback=self._any_callback, callback_args=name, queue_size=1)
+            if self.verbose:
+                print(f"{self.name}: Initialized subscriber '{name}' on topic '{topic}'")
 
     def _any_callback(self, msg, name) -> None:
-        """With the power of Python, retrieve "Any" type of ROS messages from this callback function"""
+        """With the power of interpreted types, retrieve "Any" type of ROS messages from this callback function"""
 
         setattr(self, name, msg)
+
+    def _shutdown_hook(self):
+        """Shutdown hook for ROS node"""
+
+        self.print_title(f"{self.name} is shutting down")
 
     def _run_node(self) -> None:
         """Starts ROS Node and initializes publishers and subscribers"""
 
         node_name = self.name if self.name == "EzRosNode" else "EzRosNode_" + self.name
         rospy.init_node(node_name, anonymous=True)
-        rospy.on_shutdown(self.shutdown_hook)
+        rospy.on_shutdown(self._shutdown_hook)
         self._initialize_publishers()
         self._initialize_subscribers()
         self.print_title("Node Initialized")
