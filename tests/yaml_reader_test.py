@@ -1,40 +1,15 @@
 #!/usr/bin/env python3
 
+import sys
+
 import yaml
 from munch import Munch, munchify, unmunchify
 
+# Adjust the path to include the module folder
+sys.path.insert(0, sys.path[0] + "/../src/")
+print("new path to get to ezrospy modules: ", sys.path[0])
 
-class YAMLReader(Munch):
-    """Read YAML files and store the data in an attribute style access object."""
-
-    def __init__(self, file_path):
-        """Initialize the YAML Reader"""
-        super().__init__()
-        self.read(file_path)  # Automatically read YAML data on initialization
-
-    def read(self, file_path=None):
-        """Read YAML data from file and munchify it"""
-        if file_path is None:
-            raise ValueError("YAML: No file path provided")
-        try:
-            with open(file_path, "r") as file:
-                print(f"YAML: Loading file '{file_path}'")
-                self.update(munchify(yaml.safe_load(file)))
-        except Exception as e:
-            print(f"YAML: Failed to load file '{file_path}': {e}")
-
-    def write(self, file_path=None):
-        """Write the YAML data to a file"""
-        if file_path is None:
-            raise ValueError("YAML: No file path provided")
-        try:
-            with open(file_path, "w") as file:
-                yaml.safe_dump(unmunchify(self), file)
-                print(f"YAML: File successfully written to '{file_path}'")
-        except Exception as e:
-            print(f"YAML: Failed to write file '{file_path}': {e}")
-
-    # End of class ----------------------------------------------------------------------------------------------------
+from ezrospy.ezros_tools import YAMLReader  # noqa: E402
 
 
 def test_yaml_reader():

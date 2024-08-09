@@ -14,7 +14,6 @@ import signal
 import socket
 import subprocess
 import time
-from math import asin, atan2, cos, degrees, radians, sin, sqrt
 from threading import Thread
 
 import rospkg
@@ -284,7 +283,7 @@ class EzRosNode:
     def _shutdown_hook(self):
         """Shutdown hook for ROS node"""
 
-        self.print_title(f"{self.name} is shutting down")
+        self.print_title("\U000026a0 shutting down \U000026a0")
 
     def _run_node(self) -> None:
         """Starts ROS Node and initializes publishers and subscribers"""

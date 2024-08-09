@@ -6,22 +6,108 @@ Defined Robot Types and Related Interfaces
 --------------------------------------------------------------------------------------------------------------------"""
 
 import time
+from math import asin, atan2, cos, degrees, radians, sin, sqrt
 
 import rospkg
 import rospy
 
-from ezrospy import ezros_tools as ezros_tools
+from ezrospy.ezros_tools import EzRosNode
 
 # End of Imports ------------------------------------------------------------------------------------------------------
 
 
-class EzRobot(ezros_tools.EzRosNode):
+class EzRobot(EzRosNode):
     """Class for a simplistic robot and related operations"""
 
-    def __init__(self, name: str = "EzRobot", config_file_path: str = None) -> None:
+    def __init__(self, name: str = "EzRobot", config_file_path: str = None, verbose: bool = False) -> None:
         """Initializes robot, publishers and subscribers"""
 
-        super().__init__(name, config_file_path)
+        super().__init__(name, config_file_path, verbose)
+
+        # Robot States and Properties
+        self.speed = 0.0  # m/s
+
+    def drive(self, speed=0.0, speed_kwargs: dict = {}, angle=0.0, angle_kwargs: dict = {}) -> None:
+        """Publishes twist message to drive the robot\n
+        It allows optional function-based speed and angle control.\n
+        Example: (speed=control_func, speed_kwargs={'min_speed': 0.0, 'max_speed': 3.0})"""
+
+        if callable(speed):  # Use function-based speed control
+            speed = speed(**speed_kwargs)
+        if callable(angle):  # Use function-based angle control
+            angle = angle(**angle_kwargs)
+
+        from geometry_msgs.msg import Twist  # ROS Message Type
+
+        msg = Twist()  # Create message and publish
+        msg.linear.x = speed
+        msg.angular.z = angle
+        self.pub_twist.publish(msg)
+
+    def drive_for(
+        self,
+        speed=0.0,
+        speed_kwargs: dict = {},
+        angle=0.0,
+        angle_kwargs: dict = {},
+        speed_distance: float = None,  # meters
+        duration: float = None,  # seconds
+        end_function=None,
+        end_function_kwargs: dict = {},
+    ) -> None:
+        """Creates a loop around the drive function and ends when end_function returns True\n
+        Offers some built-in end functions: speed interpolated distance and time duration\n"""
+
+        distance_traveled = 0.0  # meters
+        rate = rospy.Rate(20)  # Hz
+
+        if speed_distance is not None:  # Use speed-interpolated distance calculations
+            self.print_highlights(f"Driving for {round(speed_distance, 2)}meters...")
+            initial_time = rospy.Time.now()
+            while not rospy.is_shutdown() and distance_traveled < speed_distance:
+                # Calculate distance based on measured current speed (m/s) and time interval (dt)
+                distance_traveled += (self.speed) * (rospy.Time.now() - initial_time).to_sec()
+                initial_time = rospy.Time.now()  # Reset initial time for next iteration
+                self.drive(speed, speed_kwargs, angle, angle_kwargs)
+                rate.sleep()
+
+        elif duration is not None:  # Use time-based end condition
+            self.print_highlights(f"Driving for {round(duration, 2)}seconds...")
+            initial_time = rospy.Time.now()
+            while not rospy.is_shutdown() and (rospy.Time.now() - initial_time < rospy.Duration(duration)):
+                self.drive(speed, speed_kwargs, angle, angle_kwargs)
+                rate.sleep()
+
+        elif callable(end_function):  # Use function-based end condition
+            while not rospy.is_shutdown() and not end_function(**end_function_kwargs):
+                self.drive(speed, speed_kwargs, angle, angle_kwargs)
+                rate.sleep()
+
+    def stop(
+        self,
+        duration=None,
+        duration_kwargs: dict = {},
+    ) -> None:
+        """Stops the robot, provides built-in time duration and custom duration function capabilities\n
+        Example: (duration=wait_for_traffic_light, duration_kwargs={'check_for_pedestrians': True})"""
+
+        rate = rospy.Rate(20)  # Hz
+
+        if callable(duration):  # Use function-based end condition
+            while not rospy.is_shutdown() and not duration(**duration_kwargs):
+                self.drive(0.0, 0.0)
+                rate.sleep()
+
+        elif duration is not None:  # Use time-based end condition
+            self.print_highlights(f"Stopping for {round(duration, 2)}s...")
+
+            initial_time = rospy.Time.now()
+            while not rospy.is_shutdown() and (rospy.Time.now() - initial_time < rospy.Duration(duration)):
+                self.drive(0.0, 0.0)
+                rate.sleep()
+
+        else:  # Send a single stop command
+            self.drive(0.0)
 
     # End of Class ----------------------------------------------------------------------------------------------------
 
@@ -161,8 +247,12 @@ class HeadingEstimator:
 
     def reset_history(self):
         """Reset the waypoint history"""
+
         self.waypoints.clear()
         self.estimated_heading = None
         self.too_far_count = 0
+
+        if self.verbose:
+            print("HeadingEstimator: History reset")
 
     # End of Class ----------------------------------------------------------------------------------------------------
