@@ -5,10 +5,8 @@ Defined Robot Types and Related Interfaces
 
 --------------------------------------------------------------------------------------------------------------------"""
 
-import time
 from math import asin, atan2, cos, degrees, radians, sin, sqrt
 
-import rospkg
 import rospy
 
 from ezrospy.ezros_tools import EzRosNode
@@ -155,6 +153,7 @@ class Waypoint:
         y = cos(phi_1) * sin(phi_2) - sin(phi_1) * cos(phi_2) * cos(delta_lambda)
         return (degrees(atan2(x, y)) + 360) % 360  # Normalized to 0-360
 
+    # TODO: Implement relative bearing inside robot NOT in waypoint class
     # def relative_bearing_with(self, goal: "Waypoint") -> float:
     #     """Returns the relative bearing from the current heading to the goal waypoint in degrees\n
     #     WARNING: Only valid if current heading is known"""

@@ -1,0 +1,21 @@
+namespace: robot1                      # Namespace of the robot
+
+publishers:
+  - name: pub_twist                    # Variable name to use in code
+    topic: cmd_vel                     # Topic name relative to namespace
+    msg_file: geometry_msgs.msg        # ROS Message file to import type from
+    msg_type: Twist                    # ROS Message type
+
+subscribers:
+  - topic: camera/image_raw            # Topic name relative to namespace. Variable name will be 'msg_camera_image_raw'
+    msg_file: sensor_msgs.msg
+    msg_type: Image
+  - topic: gps
+    msg_file: sensor_msgs.msg
+    msg_type: NavSatFix
+  - topic: odom
+    msg_file: nav_msgs.msg
+    msg_type: Odometry
+  - topic: scan
+    msg_file: sensor_msgs.msg
+    msg_type: LaserScan
