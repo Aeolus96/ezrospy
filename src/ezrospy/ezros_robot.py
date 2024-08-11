@@ -110,6 +110,7 @@ class EzRobot(EzRosNode):
                 rate.sleep()
 
         else:  # Send a single stop command
+            self.print_highlights("Stopped...")
             self.drive(0.0)
 
     def update_speed(self, TimerEvent) -> None:
