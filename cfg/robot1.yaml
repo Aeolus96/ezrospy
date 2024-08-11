@@ -16,6 +16,9 @@ subscribers:
   - topic: scan
     msg_file: sensor_msgs.msg
     msg_type: LaserScan
-  - topic: camera/image_raw
-    msg_file: sensor_msgs.msg
-    msg_type: Image
+  - topic: detected_crosswalk
+    msg_file: std_msgs.msg
+    msg_type: Bool
+  # - topic: camera/image_raw
+  #   msg_file: sensor_msgs.msg
+  #   msg_type: Image
