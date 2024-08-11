@@ -24,6 +24,11 @@ class EzRobot(EzRosNode):
 
         # Robot States and Properties
         self.speed = 0.0  # m/s
+        rospy.Timer(rospy.Duration(0.01), self.update_speed)  # 100 Hz
+        self.waypoint = Waypoint(0.0, 0.0)  # Default Waypoint is kept at (0,0) for simplicity
+        self.heading = 0.0  # Default heading is kept at 0 for simplicity
+        self.heading_estimator = HeadingEstimator()
+        rospy.Timer(rospy.Duration(0.1), self.update_gps)  # 10 Hz
 
     def drive(self, speed=0.0, speed_kwargs: dict = {}, angle=0.0, angle_kwargs: dict = {}) -> None:
         """Publishes twist message to drive the robot\n
@@ -106,6 +111,21 @@ class EzRobot(EzRosNode):
 
         else:  # Send a single stop command
             self.drive(0.0)
+
+    def update_speed(self, TimerEvent) -> None:
+        """Updates current speed (m/s) using subscribed Odom message"""
+
+        self.speed = self.msg_odom.twist.twist.linear.x
+
+    def update_gps(self, TimerEvent) -> None:
+        """Updates current GPS latitude and longitude (decimal degrees) using subscribed NavSatFix message"""
+
+        latitude = self.msg_gps.latitude
+        longitude = self.msg_gps.longitude
+        self.waypoint.update(latitude, longitude)  # Update self waypoint
+        self.heading_estimator.add_waypoint(self.waypoint)  # Add to heading_estimator to estimate heading
+        if self.heading_estimator.estimated_heading is not None:
+            self.heading = self.heading_estimator.get_heading()  # Update self heading if available
 
     # End of Class ----------------------------------------------------------------------------------------------------
 

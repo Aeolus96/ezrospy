@@ -1,0 +1,10 @@
+<launch>
+    <arg name="config_file" default="$(find ezrospy)/cfg/robot1.yaml" />
+
+    <!-- Load robot's environment ............................................................. -->
+    <include file="$(find gazelle_sim_crosswalk)/launch/crosswalk.launch" />
+
+    <!-- Other dependencies like sensors or hardware IO can be added here ..................... -->
+    <!-- Since this example uses a simulated robot, no other dependencies are needed -->
+
+</launch>

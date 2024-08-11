@@ -1,0 +1,41 @@
+<!-- This is a generalized launch file to support multiple robots using input arguments -->
+
+<!-- IMPORTANT: Robot and environment dependencies should be set for each robot -->
+<!-- in a separate launch file separately named <robot_name>_sim.launch or <robot_name>_real.launch -->
+<!-- This allows for quickly switching between simulated and real robots without changing any code -->
+
+<launch>
+    <!-- Defaults are set for example case. Adjust as needed for your specific application -->
+    <arg name="simulated" default="true" />
+    <arg name="robot_name" default="robot1" />
+    <arg name="config_file" default="$(find ezrospy)/cfg/$(arg robot_name).yaml" />
+    <arg name="rosboard_port" default="8888" />
+
+
+    <!-- Load the dependencies based on robot and its environment ............................. -->
+    <!-- Usually no changes are needed here for setting up any robot -->
+    <group if="$(arg simulated)">
+        <include file="$(find ezrospy)/launch/$(arg robot_name)_sim.launch">
+            <arg name="config_file" value="$(arg config_file)" />
+        </include>
+    </group>
+
+    <group unless="$(arg simulated)">
+        <include file="$(find ezrospy)/launch/$(arg robot_name)_real.launch">
+            <arg name="config_file" value="$(arg config_file)" />
+        </include>
+    </group>
+
+
+    <!-- Independent nodes .................................................................... -->
+    <!-- These nodes are not dependent on any other nodes, robots or environments -->
+
+    <!-- EzRosPy GUI -->
+    <node name="ezrospy_gui" pkg="ezrospy" type="gui.py" respawn="true" />
+
+    <!-- ROS Board -->
+    <node name="ros_board" pkg="rosboard" type="rosboard_node" output="screen">
+        <param name="port" value="$(arg rosboard_port)" />
+    </node>
+
+</launch>
