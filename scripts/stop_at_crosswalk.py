@@ -29,12 +29,12 @@ def stop_at_crosswalk() -> bool:
     # When found, this independent node publishes True
 
     robot1.print_highlights(f"Crosswalk --> {robot1.msg_detected_crosswalk}")
-    return True if robot1.msg_detected_crosswalk else False
+    return True if robot1.msg_detected_crosswalk.data else False
 
 
 # The end condition can be set to call a function
 # NOTE: provide function name only, arguments can be passed as a dictionary to end_function_kwargs
-robot1.drive_for(speed=0.5, end_function=stop_at_crosswalk)
+robot1.drive_for(speed=0.25, end_function=stop_at_crosswalk)
 
 
 def crosswalk_is_clear(wait_for=10.0) -> bool:
