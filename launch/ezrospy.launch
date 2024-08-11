@@ -31,7 +31,7 @@
     <!-- These nodes are not dependent on any other nodes, robots or environments -->
 
     <!-- EzRosPy GUI -->
-    <node name="ezrospy_gui" pkg="ezrospy" type="gui.py" respawn="true" />
+    <node name="ezrospy_gui" pkg="ezrospy" type="gui.py" respawn="true" output="screen" />
 
     <!-- ROS Board -->
     <node name="ros_board" pkg="rosboard" type="rosboard_node" output="screen">
