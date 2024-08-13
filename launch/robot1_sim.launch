@@ -5,6 +5,14 @@
     <include file="$(find gazelle_sim_crosswalk)/launch/crosswalk.launch" />
 
     <!-- Other dependencies like sensors or hardware IO can be added here ..................... -->
-    <!-- Since this example uses a simulated robot, no other dependencies are needed -->
+
+    <!-- Simple node for publishing white pixel percentage of input image. -->
+    <!-- For Demo purposes... -->
+    <group ns="robot1">
+        <node name="white_pixel_percent" pkg="stop_at_cw_pkg" type="white_pixel_percent.py"
+            required="true" output="screen">
+            <param name="imgtopic_name" type="str" value="image_raw" />
+        </node>
+    </group>
 
 </launch>

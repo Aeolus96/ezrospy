@@ -1,46 +1,48 @@
 #!/usr/bin/env python3
 
+import time
+
 from ezrospy import ezros_tools
 from ezrospy.ezros_robot import EzRobot
 
-import time
-
-# Get the robot config file path using helper function
+# Use a helper function to get full path of this ROS package and add the config file path to it
 robot1_config = ezros_tools.package_path() + "/cfg/robot1.yaml"
+robot1 = EzRobot("robot1", robot1_config)  # Initialize the EzRobot using the config file
+# This file contains definitions of the robot's namespace, publishers, subscribers, etc. used for initialization
 
-# Initialize the EzRobot using the config file
-robot1 = EzRobot("robot1", robot1_config)
 
-# Use simple drive for X condition built-in function
+# Now we can use the simple built-in function to drive the robot using X parameters for/until Y condition is met
 robot1.drive_for(speed=1.0, duration=1.0)  # Drive at speed 1.0m/s for 1 seconds
-
-# Stop the robot instantly with built-in stop function
-robot1.stop()
+robot1.stop()  # Stop the robot instantly with the built-in stop function
 
 
-# Build behaviors to "extend" inputs or conditions using various functions:
-
-
-def stop_at_crosswalk() -> bool:
+# Now we can build "behaviors" to "extend" input parameters or end conditions using customizable functions that can
+# be passed to drive_for() or stop() methods:
+def stop_at_crosswalk(target_percent: int = 50) -> bool:
     """Returns True if the robot identifies a crosswalk"""
 
-    # This feature need not be implemented in this very script.
-    # An external ROS node can simply keep checking for the presence of a crosswalk independently
-    # When found, this independent node publishes True
+    # The processing for this feature need not be implemented in this very script or within the robot class.
+    # An external ROS node, like the white_pixel_percent node used for this demo, can keep checking for the presence
+    # of a crosswalk concurrently with other nodes. When a crosswalk is found, it publishes True to it's output topic.
+    # # We've added this output topic in the robot's config file as one of the subscribers and can be accessed as such:
 
-    robot1.print_highlights(f"Crosswalk --> {robot1.msg_detected_crosswalk}")
-    return True if robot1.msg_detected_crosswalk.data else False
+    # NOTE: The ROS messages are retrieved as is. Use proper attribute access (msg.data or msg.twist.linear.x)
+    return True if robot1.msg_white_percent.data > target_percent else False
 
 
-# The end condition can be set to call a function
+# Now we can use the function to drive the robot until the crosswalk is detected
+robot1.drive_for(speed=0.25, end_function=stop_at_crosswalk, end_function_kwargs={"target_percent": 30})
 # NOTE: provide function name only, arguments can be passed as a dictionary to end_function_kwargs
-robot1.drive_for(speed=0.25, end_function=stop_at_crosswalk)
 
 
+# Once the crosswalk is detected, we can stop the robot until the crosswalk is clear to drive over
+robot1.print_highlights("Checking if crosswalk is clear...")  # Print a "checkpoint" message to help with debugging
+
+
+# For demo purposes, we will stop the robot for X seconds and then start driving again
 def crosswalk_is_clear(wait_for=10.0) -> bool:
     """Returns True if the crosswalk is clear drive over"""
 
-    # Some function to check if the crosswalk is clear. Time used as an example
     if time.time() - initial_time > wait_for:
         robot1.print_highlights("Crosswalk is clear!")
         return True
@@ -48,12 +50,10 @@ def crosswalk_is_clear(wait_for=10.0) -> bool:
         return False
 
 
-robot1.print_highlights("Checking if crosswalk is clear...")
 initial_time = time.time()
-
-# The duration can be set to call a function with arguments
 robot1.stop(duration=crosswalk_is_clear, duration_kwargs={"wait_for": 3.0})
-
 robot1.drive_for(speed=0.5, speed_distance=2.0)  # Start driving again for X "speed derived" meters
-
-robot1.stop(duration=2.0)  # Send zeros to robot for X seconds. Real robots take time to come to a complete stop!
+robot1.stop(duration=2.0)  # Another method of stopping the robot by using the built-in time duration function.
+# Beacause real robots take time to come to a complete stop from different speeds or on a slope, you are able to
+# create your own stopping behaviors. This dynamic behavior flexibility is very useful in many scripted simulations
+# and control applications. Overall, this makes using scripted meta-behaviors intuitive and easy to develop.
