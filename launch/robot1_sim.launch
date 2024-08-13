@@ -11,7 +11,7 @@
     <group ns="robot1">
         <node name="white_pixel_percent" pkg="stop_at_cw_pkg" type="white_pixel_percent.py"
             required="true" output="screen">
-            <param name="imgtopic_name" type="str" value="image_raw" />
+            <param name="imgtopic_name" type="str" value="/robot1/camera/image_raw" />
         </node>
     </group>
 
