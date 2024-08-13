@@ -31,12 +31,13 @@ def stop_at_crosswalk(target_percent: int = 50) -> bool:
 
 
 # Now we can use the function to drive the robot until the crosswalk is detected
-robot1.drive_for(speed=0.25, end_function=stop_at_crosswalk, end_function_kwargs={"target_percent": 30})
+robot1.print_highlights("Driving until crosswalk is detected...")  # Print a "checkpoint" message to help with debugging
+robot1.drive_for(speed=0.15, end_function=stop_at_crosswalk, end_function_kwargs={"target_percent": 40})
 # NOTE: provide function name only, arguments can be passed as a dictionary to end_function_kwargs
 
 
 # Once the crosswalk is detected, we can stop the robot until the crosswalk is clear to drive over
-robot1.print_highlights("Checking if crosswalk is clear...")  # Print a "checkpoint" message to help with debugging
+robot1.print_highlights("Stopping until crosswalk is clear...")  # Print a "checkpoint" message to help with debugging
 
 
 # For demo purposes, we will stop the robot for X seconds and then start driving again
@@ -51,9 +52,9 @@ def crosswalk_is_clear(wait_for=10.0) -> bool:
 
 
 initial_time = time.time()
-robot1.stop(duration=crosswalk_is_clear, duration_kwargs={"wait_for": 3.0})
-robot1.drive_for(speed=0.5, speed_distance=2.0)  # Start driving again for X "speed derived" meters
-robot1.stop(duration=2.0)  # Another method of stopping the robot by using the built-in time duration function.
+robot1.stop(duration=crosswalk_is_clear)
+robot1.drive_for(speed=0.5, speed_distance=1.0)  # Start driving again for X "speed derived" meters
+robot1.stop(duration=3.0)  # Another method of stopping the robot by using the built-in time duration function.
 # Beacause real robots take time to come to a complete stop from different speeds or on a slope, you are able to
 # create your own stopping behaviors. This dynamic behavior flexibility is very useful in many scripted simulations
 # and control applications. Overall, this makes using scripted meta-behaviors intuitive and easy to develop.
