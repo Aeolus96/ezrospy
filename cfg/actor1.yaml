@@ -1,0 +1,12 @@
+# namespace: # Namespace of the robot
+
+publishers:
+  - name: pub_twist # Variable name to use in code
+    topic: cmd_vel # Topic name relative to namespace
+    msg_file: geometry_msgs.msg # ROS Message file to import type from
+    msg_type: Twist # ROS Message type
+
+subscribers:
+  - topic: white_percent # Used for stop_at_crosswalk demo
+    msg_file: std_msgs.msg
+    msg_type: UInt8
