@@ -20,7 +20,7 @@ then
     exit 1
 fi
 
-# Install requirements
+# Install Python packages required
 pip3 install -r requirements.txt
 
 

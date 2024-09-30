@@ -1,5 +1,4 @@
 <launch>
-    <arg name="config_file" default="$(find ezrospy)/cfg/actor1.yaml" />
 
     <!-- Load robot's environment ............................................................. -->
     <!-- Not needed for real robots -->

@@ -8,22 +8,17 @@
     <!-- Defaults are set for example case. Adjust as needed for your specific application -->
     <arg name="simulated" default="true" />
     <arg name="robot_name" default="robot1" />
-    <arg name="config_file" default="$(find ezrospy)/cfg/$(arg robot_name).yaml" />
     <arg name="rosboard_port" default="8888" />
 
 
     <!-- Load the dependencies based on robot and its environment ............................. -->
     <!-- Usually no changes are needed here for setting up any robot -->
     <group if="$(arg simulated)">
-        <include file="$(find ezrospy)/launch/$(arg robot_name)_sim.launch">
-            <arg name="config_file" value="$(arg config_file)" />
-        </include>
+        <include file="$(find ezrospy)/launch/$(arg robot_name)_sim.launch" />
     </group>
 
     <group unless="$(arg simulated)">
-        <include file="$(find ezrospy)/launch/$(arg robot_name)_real.launch">
-            <arg name="config_file" value="$(arg config_file)" />
-        </include>
+        <include file="$(find ezrospy)/launch/$(arg robot_name)_real.launch" />
     </group>
 
 
