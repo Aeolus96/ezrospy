@@ -26,7 +26,7 @@ def stop_at_crosswalk(target_percent: int = 50) -> bool:
     # We've added this topic in the robot's config file as one of the subscribers and can be accessed as such:
 
     # NOTE: The ROS messages are retrieved as is. Use proper attribute access (msg.data or msg.twist.linear.x)
-    return True if robot1.msg_white_percent.data > target_percent else False
+    return True if robot1.msg_filtered_images_grayscale_binary_image_white_percent.data > target_percent else False
 
 
 # Now we can use the function to drive the robot until the crosswalk is detected
