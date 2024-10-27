@@ -22,9 +22,8 @@ def stop_at_crosswalk(target_percent: int = 50) -> bool:
     """Returns True if the robot identifies a crosswalk"""
 
     # The processing for this feature need not be implemented in this very script or within the robot class.
-    # An external ROS node, like the white_pixel_percent node used for this demo, can keep checking for the presence
-    # of a crosswalk concurrently with other nodes. When a crosswalk is found, it publishes True to it's output topic.
-    # # We've added this output topic in the robot's config file as one of the subscribers and can be accessed as such:
+    # An external ROS node is used to keep checking for the presence of a crosswalk concurrently with other nodes.
+    # We've added this topic in the robot's config file as one of the subscribers and can be accessed as such:
 
     # NOTE: The ROS messages are retrieved as is. Use proper attribute access (msg.data or msg.twist.linear.x)
     return True if robot1.msg_white_percent.data > target_percent else False
