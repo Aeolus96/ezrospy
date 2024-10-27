@@ -5,13 +5,15 @@
 
     <!-- Other dependencies like sensors or hardware IO can be added here ..................... -->
 
-    <!-- Simple node for publishing white pixel percentage of input image. -->
+    <!-- Simple node for publishing grayscale images with white pixel percentage -->
     <!-- For Demo purposes... -->
     <group ns="robot1">
-        <node name="white_pixel_percent" pkg="stop_at_cw_pkg" type="white_pixel_percent.py"
-            required="true" output="screen">
-            <param name="imgtopic_name" type="str" value="camera/image_raw" />
-        </node>
+        <include file="$(find ros_cv_tools)/launch/filter_grayscale_binary.launch">
+            <arg name="input_image_topic" value="camera/image_raw" />
+            <arg name="output_image_topic" value="filtered_images/grayscale_binary_image" />
+            <arg name="white_percent_topic"
+                value="filtered_images/grayscale_binary_image/white_percent" />
+        </include>
     </group>
 
 </launch>
