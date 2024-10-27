@@ -14,6 +14,13 @@
             <arg name="white_percent_topic"
                 value="filtered_images/grayscale_binary_image/white_percent" />
         </include>
+
+        <include file="$(find ros_cv_tools)/launch/filter_hsv_binary.launch">
+            <arg name="input_image_topic" value="camera/image_raw" />
+            <arg name="output_image_topic" value="filtered_images/hsv_binary_image" />
+            <arg name="white_percent_topic"
+                value="filtered_images/hsv_binary_image/white_percent" />
+        </include>
     </group>
 
 </launch>
