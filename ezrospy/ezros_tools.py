@@ -15,19 +15,21 @@ import socket
 import subprocess
 import time
 from threading import Thread
+from functools import partial
 
-import rospkg
-import rospy
+import rclpy  # type: ignore  # noqa: F401
 import yaml
 from munch import Munch, munchify, unmunchify
+
+from rclpy.node import Node  # type: ignore
 
 # End of Imports ------------------------------------------------------------------------------------------------------
 
 
 def package_path(package_name: str = "ezrospy") -> str:
-    """Get a ROS package's full path"""
+    """Get a ROS package's full path. Install script must be ran in the package directory"""
 
-    return rospkg.RosPack().get_path(package_name)
+    return os.environ["EZROSPY_DIRECTORY"]
 
 
 def get_local_ip():
@@ -208,7 +210,7 @@ class YAMLReader(Munch):
     # End of class ----------------------------------------------------------------------------------------------------
 
 
-class EzRosNode:
+class EzRosNode(Node):
     """Custom ROS Tooling that simplifies setup and scripting for ROS nodes.\n
     NOTICE: Only one instance of this class should be created per python script."""
 
@@ -217,14 +219,20 @@ class EzRosNode:
         IMPORTANT: Full path from root is required!\n
         NOTICE: Only one instance of this class should be created per python script"""
 
-        if config_file_path is None:
-            raise ValueError(f"{name}: No config file provided")
-
         self.name = name
         self.config_file_path = config_file_path
         self.verbose = verbose
+
+        if config_file_path is None:
+            raise ValueError(f"{name}: No config file provided")
+
+        self.node_name = self.name if self.name == "EzRosNode" else "EzRosNode_" + self.name
+        super().__init__(self.node_name)
+
         if self._load_config():
-            self._run_node()
+            self._initialize_publishers()
+            self._initialize_subscribers()
+            self.print_title("Node Initialized")
 
     def _load_config(self) -> bool:
         """Loads configuration from YAML file"""
@@ -252,7 +260,7 @@ class EzRosNode:
             if not topic.startswith("/"):  # Add namespace if topic is not absolute
                 topic = (self.namespace if self.namespace.endswith("/") else self.namespace + "/") + topic
             msg = eval(publisher.msg_type)
-            temp_publisher = rospy.Publisher(topic, msg, queue_size=1)
+            temp_publisher = self.create_publisher(msg, topic, queue_size=1)
             setattr(self, publisher.name, temp_publisher)  # publisher.name is defined in the YAML file
             if self.verbose:
                 print(f"{self.name}: Initialized publisher '{publisher.name}' on topic '{topic}'")
@@ -263,17 +271,14 @@ class EzRosNode:
         for subscriber in self.subscribers:
             exec(f"from {subscriber.msg_file} import {subscriber.msg_type}")
             topic = str(subscriber.topic)
-            if topic.startswith("/"):  # Add namespace if topic is not absolute
-                name = f"msg_{subscriber.topic.replace('/', '_')}"  # Absolute topic name
-            else:
-                name = f"msg_{subscriber.topic.replace('/', '_')}"  # Relative topic name
+            if not topic.startswith("/"):  # Add namespace if topic is not absolute
                 topic = (self.namespace if self.namespace.endswith("/") else self.namespace + "/") + topic
             msg = eval(subscriber.msg_type)
             msg_instance = msg()
-            setattr(self, name, msg_instance)  # Initialize the instance attributes with default message objects
-            rospy.Subscriber(topic, msg, callback=self._any_callback, callback_args=name, queue_size=1)
+            setattr(self, subscriber.name, msg_instance)  # Subscriber.name is defined in the YAML file
+            self.create_subscription(msg, topic, callback=partial(self._any_callback(), name=subscriber.name))
             if self.verbose:
-                print(f"{self.name}: Initialized subscriber '{name}' on topic '{topic}'")
+                print(f"{self.name}: Initialized subscriber '{subscriber.name}' on topic '{topic}'")
 
     def _any_callback(self, msg, name) -> None:
         """With the power of interpreted types, retrieve "Any" type of ROS messages from this callback function"""
@@ -284,16 +289,6 @@ class EzRosNode:
         """Shutdown hook for ROS node"""
 
         self.print_title("\U000026a0 shutting down \U000026a0")
-
-    def _run_node(self) -> None:
-        """Starts ROS Node and initializes publishers and subscribers"""
-
-        node_name = self.name if self.name == "EzRosNode" else "EzRosNode_" + self.name
-        rospy.init_node(node_name, anonymous=True)
-        rospy.on_shutdown(self._shutdown_hook)
-        self._initialize_publishers()
-        self._initialize_subscribers()
-        self.print_title("Node Initialized")
 
     def print_highlights(self, text: str) -> None:
         """Prints text to stdout in a centered "highlight" style format"""

@@ -7,15 +7,19 @@ publishers:
     msg_type: Twist # ROS Message type
 
 subscribers:
-  - topic: odom # Topic name relative to namespace, variable name becomes "msg_" + topic = "msg_odom"
+  - name: msg_odom
+    topic: odom
     msg_file: nav_msgs.msg
     msg_type: Odometry
-  - topic: gps
+  - name: msg_gps
+    topic: gps
     msg_file: sensor_msgs.msg
     msg_type: NavSatFix
-  - topic: scan
+  - name: msg_scan
+    topic: scan
     msg_file: sensor_msgs.msg
     msg_type: LaserScan
-  - topic: filtered_images/grayscale_binary_image/white_percent # Used for stop_at_crosswalk demo
+  - name: msg_white_percent
+    topic: filtered_images/grayscale_binary_image/white_percent # Used for stop_at_crosswalk demo
     msg_file: std_msgs.msg
     msg_type: Float32

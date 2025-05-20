@@ -1,32 +1,20 @@
 #!/bin/bash
 
+# set current directory as environment variable in bashrc
+echo "export EZROSPY_DIRECTORY=$(pwd)" >> ~/.bashrc
+
+
 # Install base packages
 sudo apt install -y lsb-release curl gpg python3-wstool python3-catkin-tools
 
 
 # ----- Install requirements.txt -----
-# Check Python version
-PYTHON_VERSION=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
-
-if [[ $(python3 -c "import sys; print(sys.version_info >= (3, 8))") == "False" ]]; then
-    echo "Python version 3.8 or higher is required."
-    exit 1
-fi
-
-# Check if pip3 is installed
-if ! command -v pip3 &> /dev/null
-then
-    echo "pip3 is not installed. Please install pip3 manually."
-    exit 1
-fi
-
-# Install Python packages required
 pip3 install -r requirements.txt
 
 
 # ----- Make python scripts executable -----
 sudo chmod +x scripts/*.py
-
+sudo chmod +x ezrospy/*.py
 
 # ----- Clone repositories and install -----
 declare -A repositories=(
@@ -47,8 +35,5 @@ done
 
 
 # ----- Build workspace -----
-catkin build ezrospy rosboard
-
-
-# ----- Skiplist packages -----
-catkin config --skiplist rosboard
+# custom alias imported from another general workspace setup script, basically colcon build --symlink-install
+rosbuild
