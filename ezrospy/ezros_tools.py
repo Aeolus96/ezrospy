@@ -234,6 +234,11 @@ class EzRosNode(Node):
             self._initialize_subscribers()
             self.print_title("Node Initialized")
 
+    def __del__(self):
+        """Instance destructor"""
+
+        self.print_title("\U000026a0 shutting down \U000026a0")
+
     def _load_config(self) -> bool:
         """Loads configuration from YAML file"""
 
@@ -260,7 +265,7 @@ class EzRosNode(Node):
             if not topic.startswith("/"):  # Add namespace if topic is not absolute
                 topic = (self.namespace if self.namespace.endswith("/") else self.namespace + "/") + topic
             msg = eval(publisher.msg_type)
-            temp_publisher = self.create_publisher(msg, topic, queue_size=1)
+            temp_publisher = self.create_publisher(msg, topic, 10)
             setattr(self, publisher.name, temp_publisher)  # publisher.name is defined in the YAML file
             if self.verbose:
                 print(f"{self.name}: Initialized publisher '{publisher.name}' on topic '{topic}'")
@@ -284,11 +289,6 @@ class EzRosNode(Node):
         """With the power of interpreted types, retrieve "Any" type of ROS messages from this callback function"""
 
         setattr(self, name, msg)
-
-    def _shutdown_hook(self):
-        """Shutdown hook for ROS node"""
-
-        self.print_title("\U000026a0 shutting down \U000026a0")
 
     def print_highlights(self, text: str) -> None:
         """Prints text to stdout in a centered "highlight" style format"""

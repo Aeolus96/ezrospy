@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
 import time
+
 import rclpy  # type: ignore  # noqa: F401
 from rclpy.executors import ExternalShutdownException  # type: ignore  # noqa: F401
+
 from ezrospy import ezros_tools
 from ezrospy.ezros_robot import EzRobot
 
@@ -43,16 +45,18 @@ def script():
     )  # Print a "checkpoint" message to help with debugging
 
     # For demo purposes, we will stop the robot for X seconds and then start driving again
-    def crosswalk_is_clear(wait_for=10.0) -> bool:
-        """Returns True if the crosswalk is clear drive over"""
+    def crosswalk_is_clear(wait_for=10.0, initial_time=None) -> bool:
+        """Returns True if the crosswalk is clear to drive over"""
 
-        if time.time() - initial_time > wait_for:
+        if initial_time is None:
+            initial_time = robot1.get_clock().now()
+
+        elapsed = (robot1.get_clock().now() - initial_time).nanoseconds / 1e9
+        if elapsed > wait_for:
             robot1.print_highlights("Crosswalk is clear!")
             return True
-        else:
-            return False
+        return False
 
-    initial_time = time.time()
     robot1.stop(duration=crosswalk_is_clear)
     robot1.drive_for(speed=0.5, speed_distance=1.0)  # Start driving again for X "speed derived" meters
     robot1.stop(duration=3.0)  # Another method of stopping the robot by using the built-in time duration function.
@@ -65,7 +69,6 @@ def main(args=None):
     try:
         with rclpy.init(args=args):
             script()
-
         rclpy.shutdown()
     except (ExternalShutdownException, KeyboardInterrupt):
         pass

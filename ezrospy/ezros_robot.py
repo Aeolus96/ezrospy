@@ -7,7 +7,7 @@ Defined Robot Types and Related Interfaces
 
 from math import asin, atan2, cos, degrees, radians, sin, sqrt
 
-import rospy
+import rclpy  # type: ignore  # noqa: F401
 
 from ezrospy.ezros_tools import EzRosNode
 
@@ -24,11 +24,26 @@ class EzRobot(EzRosNode):
 
         # Robot States and Properties
         self.speed = 0.0  # m/s
-        rospy.Timer(rospy.Duration(0.01), self.update_speed)  # 100 Hz
+        self.create_timer(0.01, self.update_speed)  # 100 Hz
         self.waypoint = Waypoint(0.0, 0.0)  # Default Waypoint is kept at (0,0) for simplicity
         self.heading = 0.0  # Default heading is kept at 0 for simplicity
         self.heading_estimator = HeadingEstimator()
-        rospy.Timer(rospy.Duration(0.1), self.update_gps)  # 10 Hz
+        self.create_timer(0.1, self.update_gps)  # 10 Hz
+
+    def update_speed(self) -> None:
+        """Updates current speed (m/s) using subscribed Odom message"""
+
+        self.speed = self.msg_odom.twist.twist.linear.x
+
+    def update_gps(self) -> None:
+        """Updates current GPS latitude and longitude (decimal degrees) using subscribed NavSatFix message"""
+
+        latitude = self.msg_gps.latitude
+        longitude = self.msg_gps.longitude
+        self.waypoint.update(latitude, longitude)  # Update self waypoint
+        self.heading_estimator.add_waypoint(self.waypoint)  # Add to heading_estimator to estimate heading
+        if self.heading_estimator.estimated_heading is not None:
+            self.heading = self.heading_estimator.get_heading()  # Update self heading if available
 
     def drive(self, speed=0.0, speed_kwargs: dict = {}, angle=0.0, angle_kwargs: dict = {}) -> None:
         """Publishes twist message to drive the robot\n
@@ -62,27 +77,27 @@ class EzRobot(EzRosNode):
         Offers some built-in end functions: speed interpolated distance and time duration\n"""
 
         distance_traveled = 0.0  # meters
-        rate = rospy.Rate(20)  # Hz
+        rate = self.create_rate(20)  # 20Hz
 
         if speed_distance is not None:  # Use speed-interpolated distance calculations
             self.print_highlights(f"Driving for {round(speed_distance, 2)}meters...")
-            initial_time = rospy.Time.now()
-            while not rospy.is_shutdown() and distance_traveled < speed_distance:
+            initial_time = self.get_clock().now()
+            while rclpy.ok() and distance_traveled < speed_distance:
                 # Calculate distance based on measured current speed (m/s) and time interval (dt)
-                distance_traveled += (self.speed) * (rospy.Time.now() - initial_time).to_sec()
-                initial_time = rospy.Time.now()  # Reset initial time for next iteration
+                distance_traveled += (self.speed) * ((self.get_clock().now() - initial_time).nanoseconds / 1e9)
+                initial_time = self.get_clock().now()  # Reset initial time for next iteration
                 self.drive(speed, speed_kwargs, angle, angle_kwargs)
                 rate.sleep()
 
         elif duration is not None:  # Use time-based end condition
             self.print_highlights(f"Driving for {round(duration, 2)}seconds...")
-            initial_time = rospy.Time.now()
-            while not rospy.is_shutdown() and (rospy.Time.now() - initial_time < rospy.Duration(duration)):
+            initial_time = self.get_clock().now()
+            while rclpy.ok() and ((self.get_clock().now() - initial_time).nanoseconds / 1e9 < duration):
                 self.drive(speed, speed_kwargs, angle, angle_kwargs)
                 rate.sleep()
 
         elif callable(end_function):  # Use function-based end condition
-            while not rospy.is_shutdown() and not end_function(**end_function_kwargs):
+            while rclpy.ok() and not end_function(**end_function_kwargs):
                 self.drive(speed, speed_kwargs, angle, angle_kwargs)
                 rate.sleep()
 
@@ -94,39 +109,24 @@ class EzRobot(EzRosNode):
         """Stops the robot, provides built-in time duration and custom duration function capabilities\n
         Example: (duration=wait_for_traffic_light, duration_kwargs={'check_for_pedestrians': True})"""
 
-        rate = rospy.Rate(20)  # Hz
+        rate = self.create_rate(20)  # 20Hz
 
         if callable(duration):  # Use function-based end condition
-            while not rospy.is_shutdown() and not duration(**duration_kwargs):
+            while rclpy.ok() and not duration(**duration_kwargs):
                 self.drive(0.0, 0.0)
                 rate.sleep()
 
         elif duration is not None:  # Use time-based end condition
             self.print_highlights(f"Stopping for {round(duration, 2)}s...")
 
-            initial_time = rospy.Time.now()
-            while not rospy.is_shutdown() and (rospy.Time.now() - initial_time < rospy.Duration(duration)):
+            initial_time = self.get_clock().now()
+            while rclpy.ok() and ((self.get_clock().now() - initial_time).nanoseconds / 1e9 < duration):
                 self.drive(0.0, 0.0)
                 rate.sleep()
 
         else:  # Send a single stop command
             self.print_highlights("Stopped...")
             self.drive(0.0)
-
-    def update_speed(self, TimerEvent) -> None:
-        """Updates current speed (m/s) using subscribed Odom message"""
-
-        self.speed = self.msg_odom.twist.twist.linear.x
-
-    def update_gps(self, TimerEvent) -> None:
-        """Updates current GPS latitude and longitude (decimal degrees) using subscribed NavSatFix message"""
-
-        latitude = self.msg_gps.latitude
-        longitude = self.msg_gps.longitude
-        self.waypoint.update(latitude, longitude)  # Update self waypoint
-        self.heading_estimator.add_waypoint(self.waypoint)  # Add to heading_estimator to estimate heading
-        if self.heading_estimator.estimated_heading is not None:
-            self.heading = self.heading_estimator.get_heading()  # Update self heading if available
 
     # End of Class ----------------------------------------------------------------------------------------------------
 
