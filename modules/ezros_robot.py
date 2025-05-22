@@ -77,7 +77,7 @@ class EzRobot(EzRosNode):
         Offers some built-in end functions: speed interpolated distance and time duration\n"""
 
         distance_traveled = 0.0  # meters
-        rate = self.create_rate(20)  # 20Hz
+        rate = self.create_rate(50)  # 50Hz
 
         if speed_distance is not None:  # Use speed-interpolated distance calculations
             self.print_highlights(f"Driving for {round(speed_distance, 2)}meters...")
@@ -109,7 +109,7 @@ class EzRobot(EzRosNode):
         """Stops the robot, provides built-in time duration and custom duration function capabilities\n
         Example: (duration=wait_for_traffic_light, duration_kwargs={'check_for_pedestrians': True})"""
 
-        rate = self.create_rate(20)  # 20Hz
+        rate = self.create_rate(50)  # 50Hz
 
         if callable(duration):  # Use function-based end condition
             while rclpy.ok() and not duration(**duration_kwargs):

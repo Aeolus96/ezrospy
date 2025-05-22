@@ -229,6 +229,10 @@ class EzRosNode(Node):
         self.node_name = self.name if self.name == "EzRosNode" else "EzRosNode_" + self.name
         super().__init__(self.node_name)
 
+        # Create a thread to run rclpy.spin
+        thread = Thread(target=rclpy.spin, args=(self,), daemon=True)
+        thread.start()
+
         if self._load_config():
             self._initialize_publishers()
             self._initialize_subscribers()
