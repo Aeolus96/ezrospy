@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
+import ezros_tools
 
-from ezrospy import ezros_tools
 from nicegui import ui
 from nicegui.events import KeyEventArguments
 
@@ -33,7 +33,7 @@ class PlayStopButton(ui.button):
 
     def update(self) -> None:
         self.props(
-            f'color={"negative" if script_player.process_is_running else "positive"} icon-right={"stop" if script_player.process_is_running else "play_arrow"}'
+            f"color={'negative' if script_player.process_is_running else 'positive'} icon-right={'stop' if script_player.process_is_running else 'play_arrow'}"
         )
         super().update()
 

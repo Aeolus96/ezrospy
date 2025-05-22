@@ -14,6 +14,7 @@ setup(
         ("share/" + package_name, glob("launch/*.py")),
         ("share/" + package_name + "/config/", glob("config/*")),
         ("share/" + package_name + "/scripts/", glob("scripts/*")),
+        ("share/" + package_name + "/ezrospy/", glob("ezrospy/*")),
     ],
     install_requires=["setuptools"],
     zip_safe=True,
@@ -24,7 +25,7 @@ setup(
     tests_require=["pytest"],
     entry_points={
         "console_scripts": [
-            f"ezrospy = {package_name}.gui:main",
+            f"ezrospy_gui = {package_name}.gui:main",
         ],
     },
 )
