@@ -281,7 +281,7 @@ class EzRosNode(Node):
             msg = eval(subscriber.msg_type)
             msg_instance = msg()
             setattr(self, subscriber.name, msg_instance)  # Subscriber.name is defined in the YAML file
-            self.create_subscription(msg, topic, callback=partial(self._any_callback(), name=subscriber.name))
+            self.create_subscription(msg, topic, callback=partial(self._any_callback, name=subscriber.name))
             if self.verbose:
                 print(f"{self.name}: Initialized subscriber '{subscriber.name}' on topic '{topic}'")
 
