@@ -67,8 +67,8 @@ def script():
 
 def main(args=None):
     try:
-        with rclpy.init(args=args):
-            script()
+        rclpy.init(args=args)
+        script()
         rclpy.shutdown()
     except (ExternalShutdownException, KeyboardInterrupt):
         pass
