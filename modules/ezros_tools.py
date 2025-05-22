@@ -265,7 +265,7 @@ class EzRosNode(Node):
             if not topic.startswith("/"):  # Add namespace if topic is not absolute
                 topic = (self.namespace if self.namespace.endswith("/") else self.namespace + "/") + topic
             msg = eval(publisher.msg_type)
-            temp_publisher = self.create_publisher(msg, topic, 10)
+            temp_publisher = self.create_publisher(msg, topic, qos_profile=10)
             setattr(self, publisher.name, temp_publisher)  # publisher.name is defined in the YAML file
             if self.verbose:
                 print(f"{self.name}: Initialized publisher '{publisher.name}' on topic '{topic}'")
@@ -281,7 +281,9 @@ class EzRosNode(Node):
             msg = eval(subscriber.msg_type)
             msg_instance = msg()
             setattr(self, subscriber.name, msg_instance)  # Subscriber.name is defined in the YAML file
-            self.create_subscription(msg, topic, callback=partial(self._any_callback, name=subscriber.name))
+            self.create_subscription(
+                msg, topic, callback=partial(self._any_callback, name=subscriber.name), qos_profile=10
+            )
             if self.verbose:
                 print(f"{self.name}: Initialized subscriber '{subscriber.name}' on topic '{topic}'")
 
