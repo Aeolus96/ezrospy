@@ -55,7 +55,7 @@ def script():
         return False
 
     initial_time = float(robot1.get_clock().now().nanoseconds / 1e9)
-    robot1.stop(duration=crosswalk_is_clear, duration_kwargs={initial_time: initial_time})
+    robot1.stop(duration=crosswalk_is_clear, duration_kwargs={"initial_time": initial_time})
     robot1.drive_for(speed=0.5, speed_distance=1.0)  # Start driving again for X "speed derived" meters
     robot1.stop(duration=3.0)  # Another method of stopping the robot by using the built-in time duration function.
     # Beacause real robots take time to come to a complete stop from different speeds or on a slope, you are able to
