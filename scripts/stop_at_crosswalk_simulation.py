@@ -2,8 +2,8 @@
 
 import time
 
-from ezrospy import ezros_tools
-from ezrospy.ezros_robot import EzRobot
+import modules.ezros_tools as ezros_tools
+from modules.ezros_robot import EzRobot
 
 # Use a helper function to get full path of this ROS package and add the config file path to it
 robot1_config = ezros_tools.package_path() + "/cfg/robot1.yaml"

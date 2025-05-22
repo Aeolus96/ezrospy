@@ -5,8 +5,8 @@ import time
 import rclpy  # type: ignore  # noqa: F401
 from rclpy.executors import ExternalShutdownException  # type: ignore  # noqa: F401
 
-from ezrospy import ezros_tools
-from ezrospy.ezros_robot import EzRobot
+import modules.ezros_tools as ezros_tools
+from modules.ezros_robot import EzRobot
 
 
 def script():
