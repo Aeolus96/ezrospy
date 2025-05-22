@@ -245,6 +245,7 @@ class EzRosNode(Node):
         try:
             config_parameters = YAMLReader(file_path=self.config_file_path)
             for key, value in config_parameters.items():
+                print(type(key), type(value))
                 setattr(self, key, value)
             # Default namespace is relative unless specified
             self.namespace = getattr(config_parameters, "namespace", "")
