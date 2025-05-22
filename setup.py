@@ -14,7 +14,7 @@ setup(
         ("share/" + package_name, glob("launch/*.py")),
         ("share/" + package_name + "/config/", glob("config/*")),
         ("share/" + package_name + "/scripts/", glob("scripts/*")),
-        ("share/" + package_name + "/modules/", glob("modules/*")),
+        ("share/" + package_name + "/modules/", ["modules/ezros_robot.py", "modules/ezros_tools.py"]),
     ],
     install_requires=["setuptools"],
     zip_safe=True,
