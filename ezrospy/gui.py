@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-import ezros_tools
 
 from nicegui import ui
 from nicegui.events import KeyEventArguments
+
+import modules.ezros_tools as ezros_tools
 
 # End of Imports ------------------------------------------------------------------------------------------------------
 

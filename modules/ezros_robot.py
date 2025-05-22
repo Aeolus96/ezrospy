@@ -9,7 +9,7 @@ from math import asin, atan2, cos, degrees, radians, sin, sqrt
 
 import rclpy  # type: ignore  # noqa: F401
 
-from ezrospy.ezros_tools import EzRosNode
+from modules.ezros_tools import EzRosNode
 
 # End of Imports ------------------------------------------------------------------------------------------------------
 
