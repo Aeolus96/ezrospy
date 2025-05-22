@@ -259,7 +259,7 @@ class EzRosNode(Node):
     def _initialize_publishers(self) -> None:
         """Initializes publishers as described in YAML file @ config_file_path"""
 
-        for publisher in self.publishers:
+        for publisher in self.pubs:
             exec(f"from {publisher.msg_file} import {publisher.msg_type}")
             topic = str(publisher.topic)
             if not topic.startswith("/"):  # Add namespace if topic is not absolute
@@ -273,7 +273,7 @@ class EzRosNode(Node):
     def _initialize_subscribers(self) -> None:
         """Initializes subscribers as described in YAML file @ config_file_path"""
 
-        for subscriber in self.subscribers:
+        for subscriber in self.subs:
             exec(f"from {subscriber.msg_file} import {subscriber.msg_type}")
             topic = str(subscriber.topic)
             if not topic.startswith("/"):  # Add namespace if topic is not absolute

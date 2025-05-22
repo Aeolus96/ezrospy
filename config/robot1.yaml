@@ -1,12 +1,12 @@
 namespace: robot1 # Namespace of the robot
 
-publishers:
+pubs:
   - name: pub_twist # Variable name to use in code
     topic: cmd_vel # Topic name relative to namespace
     msg_file: geometry_msgs.msg # ROS Message file to import type from
     msg_type: Twist # ROS Message type
 
-subscribers:
+subs:
   - name: msg_odom
     topic: odom
     msg_file: nav_msgs.msg
