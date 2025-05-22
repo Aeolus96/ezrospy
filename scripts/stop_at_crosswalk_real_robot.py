@@ -48,16 +48,14 @@ def script():
     def crosswalk_is_clear(wait_for=10.0, initial_time=None) -> bool:
         """Returns True if the crosswalk is clear to drive over"""
 
-        if initial_time is None:
-            initial_time = robot1.get_clock().now()
-
         elapsed = (robot1.get_clock().now() - initial_time).nanoseconds / 1e9
         if elapsed > wait_for:
             robot1.print_highlights("Crosswalk is clear!")
             return True
         return False
 
-    robot1.stop(duration=crosswalk_is_clear)
+    initial_time = robot1.get_clock().now()
+    robot1.stop(duration=crosswalk_is_clear, duration_kwargs={initial_time: initial_time})
     robot1.drive_for(speed=0.5, speed_distance=1.0)  # Start driving again for X "speed derived" meters
     robot1.stop(duration=3.0)  # Another method of stopping the robot by using the built-in time duration function.
     # Beacause real robots take time to come to a complete stop from different speeds or on a slope, you are able to
