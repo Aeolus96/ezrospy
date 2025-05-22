@@ -12,7 +12,7 @@ from modules.ezros_robot import EzRobot
 def script():
     # Use a helper function to get full path of this ROS package and add the config file path to it
     robot1_config = ezros_tools.package_path() + "/config/robot1.yaml"
-    robot1 = EzRobot("robot1", robot1_config)  # Initialize the EzRobot using the config file
+    robot1 = EzRobot("robot1", robot1_config, verbose=True)  # Initialize the EzRobot using the config file
     # This file contains definitions of the robot's namespace, publishers, subscribers, etc. used for initialization
 
     # Now we can use the simple built-in function to drive the robot using X parameters for/until Y condition is met
