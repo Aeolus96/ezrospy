@@ -22,7 +22,6 @@ setup(
     maintainer_email="dbutani@ltu.edu",
     description="Ezrospy package for scripting with ROS",
     license="MIT",
-    tests_require=["pytest"],
     entry_points={
         "console_scripts": [
             f"ezrospy_gui = {package_name}.gui:main",
