@@ -52,52 +52,51 @@ def handle_playback_key(e: KeyEventArguments):  # Handle keyboard events for pla
 
 # GUI Setup -----------------------------------------------------------------------------------------------------------
 class NiceGuiNode(Node):
-    ui.add_css("""
-        :root {
-            --nicegui-default-padding: 0.5rem;
-            --nicegui-default-gap: 0.5rem;
-        }
-    """)
-    background = """
-        background: linear-gradient(270deg, #ffe61f, #ff782a, #ffb731);
-        background-size: 600% 600%;
-
-        -webkit-animation: AnimationName 200s ease infinite;
-        -moz-animation: AnimationName 200s ease infinite;
-        animation: AnimationName 200s ease infinite;
-    """
-    gradient = """
-        @-webkit-keyframes AnimationName {
-            0%{background-position:0% 50%}
-            50%{background-position:100% 50%}
-            100%{background-position:0% 50%}
-        }
-        @-moz-keyframes AnimationName {
-            0%{background-position:0% 50%}
-            50%{background-position:100% 50%}
-            100%{background-position:0% 50%}
-        }
-        @-o-keyframes AnimationName {
-            0%{background-position:0% 50%}
-            50%{background-position:100% 50%}
-            100%{background-position:0% 50%}
-        }
-        @keyframes AnimationName {
-            0%{background-position:0% 50%}
-            50%{background-position:100% 50%}
-            100%{background-position:0% 50%}
-        }
-    """
-
     def __init__(self) -> None:
         super().__init__("ezrospy_gui")
 
         with Client.auto_index_client:
+            ui.add_css("""
+                :root {
+                    --nicegui-default-padding: 0.5rem;
+                    --nicegui-default-gap: 0.5rem;
+                }
+            """)
+            background = """
+                background: linear-gradient(270deg, #ffe61f, #ff782a, #ffb731);
+                background-size: 600% 600%;
+
+                -webkit-animation: AnimationName 200s ease infinite;
+                -moz-animation: AnimationName 200s ease infinite;
+                animation: AnimationName 200s ease infinite;
+            """
+            gradient = """
+                @-webkit-keyframes AnimationName {
+                    0%{background-position:0% 50%}
+                    50%{background-position:100% 50%}
+                    100%{background-position:0% 50%}
+                }
+                @-moz-keyframes AnimationName {
+                    0%{background-position:0% 50%}
+                    50%{background-position:100% 50%}
+                    100%{background-position:0% 50%}
+                }
+                @-o-keyframes AnimationName {
+                    0%{background-position:0% 50%}
+                    50%{background-position:100% 50%}
+                    100%{background-position:0% 50%}
+                }
+                @keyframes AnimationName {
+                    0%{background-position:0% 50%}
+                    50%{background-position:100% 50%}
+                    100%{background-position:0% 50%}
+                }
+            """
 
             @ui.page("/", title="EzRosPy UI")  # Set the page title and path
             def index():
-                ui.query("body").style(f"{self.background}")  # Set the background
-                ui.add_css(f"{self.gradient}")  # Animate the background
+                ui.query("body").style(f"{background}")  # Set the background
+                ui.add_css(f"{gradient}")  # Animate the background
 
                 # Main Card -------------------------------------------------------------------------------------------------------
                 with ui.card().tight() as page_card:
