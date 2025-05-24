@@ -12,7 +12,7 @@ def launch_gui():
     return Node(
         name="ezrospy_gui",
         package="ezrospy",
-        executable="gui",
+        executable="ezrospy_gui",
         output="screen",
     )
 

@@ -27,5 +27,5 @@ subs:
 service_calls: # ROS Service calls
   - name: srv_yolo # Name of client. Request is this name + _req
     topic: detect_object
-    msg_file: route_yolo_ros2.srv
+    msg_file: route_yolo_service.srv
     msg_type: DetectObject

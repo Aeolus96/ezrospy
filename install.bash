@@ -36,4 +36,5 @@ done
 
 # ----- Build workspace -----
 # custom alias imported from another general workspace setup script, basically colcon build --symlink-install
+source ~/.bashrc
 rosbuild

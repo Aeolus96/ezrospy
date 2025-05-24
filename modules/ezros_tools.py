@@ -50,7 +50,7 @@ def get_local_ip():
 class ScriptPlayer:
     """Executes Python scripts as a subprocess."""
 
-    def __init__(self, directory: str) -> None:
+    def __init__(self, directory: str = package_path() + "/scripts/") -> None:
         """Initialize the Script Player"""
 
         self.active_directory = directory  # Full path to the directory
