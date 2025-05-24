@@ -236,6 +236,7 @@ class EzRosNode(Node):
         if self._load_config():
             self._initialize_publishers()
             self._initialize_subscribers()
+            self._initialize_services()
             self.print_title("Node Initialized")
 
     def __del__(self):
@@ -290,6 +291,25 @@ class EzRosNode(Node):
             )
             if self.verbose:
                 print(f"{self.name}: Initialized subscriber '{subscriber.name}' on topic '{topic}'")
+
+    def _initialize_services(self) -> None:
+        """Initializes service clients as described in YAML file @ config_file_path"""
+        # NOTE: Service requests and responses are "Any" type
+
+        for client in self.service_calls:
+            exec(f"from {client.msg_file} import {client.msg_type}")
+            topic = str(client.topic)
+            if not topic.startswith("/"):  # Add namespace if topic is not absolute
+                topic = (self.namespace if self.namespace.endswith("/") else self.namespace + "/") + topic
+
+            service_type = eval(client.msg_type)
+            temp_client = self.create_client(service_type, topic)
+            setattr(self, client.name, temp_client)
+            setattr(self, client.name + "_req", service_type.Request())
+
+            if self.verbose:
+                print(f"{self.name}: Initialized service client '{client.name}' on topic '{topic}'")
+                print(f"{self.name}: Make requests with '{client.name}_req'")
 
     def _any_callback(self, msg, name) -> None:
         """With the power of interpreted types, retrieve "Any" type of ROS messages from this callback function"""

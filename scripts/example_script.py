@@ -1,14 +1,23 @@
 #!/usr/bin/env python3
 
-import time
+import time  # noqa: F401
 
 import rclpy  # type: ignore  # noqa: F401
 from rclpy.executors import ExternalShutdownException  # type: ignore  # noqa: F401
 
 import modules.ezros_tools as ezros_tools
 from modules.ezros_robot import EzRobot
+# End of Imports ------------------------------------------------------------------------------------------------------
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Test script: stop_at_crosswalk_real_robot.py
+# Example code for demonstrating the use of the ezrospy scripting framework
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
+# Main Script ---------------------------------------------------------------------------------------------------------
 def script():
     # Use a helper function to get full path of this ROS package and add the config file path to it
     robot1_config = ezros_tools.package_path() + "/config/robot1.yaml"
@@ -63,6 +72,7 @@ def script():
     # and control applications. Overall, this makes using scripted meta-behaviors intuitive and easy to develop.
 
 
+# Main Executer (No need to change) -----------------------------------------------------------------------------------
 def main(args=None):
     try:
         rclpy.init(args=args)

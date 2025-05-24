@@ -2,27 +2,19 @@ namespace: robot1 # Namespace of the robot
 
 pubs:
   - name: pub_twist # Variable name to use in code
-    topic: cmd_vel # Topic name relative to namespace
+    topic: /cmd_vel # Topic name relative to namespace
     msg_file: geometry_msgs.msg # ROS Message file to import type from
     msg_type: Twist # ROS Message type
 
 subs:
   - name: msg_odom
-    topic: odom
+    topic: /odometry_local
     msg_file: nav_msgs.msg
     msg_type: Odometry
   - name: msg_gps
-    topic: gps
+    topic: /ublox/fix
     msg_file: sensor_msgs.msg
     msg_type: NavSatFix
-  - name: msg_scan
-    topic: scan
-    msg_file: sensor_msgs.msg
-    msg_type: LaserScan
-  - name: msg_white_percent
-    topic: filtered_images/grayscale_binary_image/white_percent # Used for stop_at_crosswalk demo
-    msg_file: std_msgs.msg
-    msg_type: Float32
 
 service_calls: # ROS Service calls
   - name: srv_yolo # Name of client. Request is this name + _req

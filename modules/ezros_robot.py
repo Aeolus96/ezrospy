@@ -9,7 +9,7 @@ from math import asin, atan2, cos, degrees, radians, sin, sqrt
 
 import rclpy  # type: ignore  # noqa: F401
 
-from modules.ezros_tools import EzRosNode
+from modules.ezros_tools import EzRosNode, package_path
 
 # End of Imports ------------------------------------------------------------------------------------------------------
 
@@ -276,3 +276,38 @@ class HeadingEstimator:
             print("HeadingEstimator: History reset")
 
     # End of Class ----------------------------------------------------------------------------------------------------
+
+
+class Schoolbus(EzRobot):
+    """Class for the Schoolbus robot"""
+
+    def __init__(
+        self,
+        name: str = "Schoolbus",
+        config_file_path: str = package_path("ezrospy") + "/config/schoolbus.yaml",
+        verbose: bool = False,
+    ):
+        super().__init__(name, config_file_path, verbose)
+
+    def yolo_look_for(self, target: str = "person") -> None:
+        """Calls the yolo service to look for a specific target class.
+        Check values of yolo_count and yolo_size to see if a target was found"""
+        # NOTE: throttle the yolo service calls to avoid overloading threads
+
+        self.srv_yolo_req.target = target
+        # Call the yolo service and tie it to a callback
+        future = self.srv_yolo.call_async(self.srv_yolo_req)
+        future.add_done_callback(self.yolo_callback)
+
+    def yolo_callback(self, future):
+        """Callback function for the yolo service"""
+
+        try:
+            response = future.result()
+            if response:  # update the yolo_count and yolo_size directly in the class
+                self.yolo_count = response.count
+                self.yolo_size = response.size
+                if self.verbose:
+                    print(f"Found {self.yolo_count}x {self.srv_yolo_req.target}, {self.yolo_size}% of image")
+        except Exception as e:
+            print(f"- ! - ! - ! - !- Exception in yolo_callback - ! - ! - ! - !-\n{e}")
