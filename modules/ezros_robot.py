@@ -127,6 +127,9 @@ class EzRobot(EzRosNode):
         else:  # Send a single stop command
             self.print_highlights("Stopped...")
             self.drive(0.0)
+            
+    def lane_center(self, gain : float = 1.0):
+        return self.msg_blob_cmd.angular.z * gain
 
     # End of Class ----------------------------------------------------------------------------------------------------
 

@@ -2,9 +2,13 @@ namespace: robot1 # Namespace of the robot
 
 pubs:
   - name: pub_twist # Variable name to use in code
-    topic: /cmd_vel # Topic name relative to namespace
+    topic: /control/cmd_vel # Topic name relative to namespace
     msg_file: geometry_msgs.msg # ROS Message file to import type from
     msg_type: Twist # ROS Message type
+  - name: pub_drive_mode
+    topic: /control/set_drive_mode
+    msg_file: std_msgs.msg
+    msg_type: String
 
 subs:
   - name: msg_odom
@@ -15,6 +19,19 @@ subs:
     topic: /ublox/fix
     msg_file: sensor_msgs.msg
     msg_type: NavSatFix
+  - name: msg_blob_cmd
+    topic: /blob/cmd_vel
+    msg_file: geometry_msgs.msg
+    msg_type: Twist
+  - name: msg_imu
+    topic: /imu/data_raw
+    msg_file: sensor_msgs.msg
+    msg_type: Imu
+  - name: msg_navheading
+    topic: /navheading
+    msg_file: sensor_msgs.msg
+    msg_type: Imu
+
 
 service_calls: # ROS Service calls
   - name: srv_yolo # Name of client. Request is this name + _req
