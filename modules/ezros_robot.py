@@ -127,9 +127,6 @@ class EzRobot(EzRosNode):
         else:  # Send a single stop command
             self.print_highlights("Stopped...")
             self.drive(0.0)
-            
-    def lane_center(self, gain : float = 1.0):
-        return self.msg_blob_cmd.angular.z * gain
 
     # End of Class ----------------------------------------------------------------------------------------------------
 
@@ -214,7 +211,7 @@ class HeadingEstimator:
         self.min_distance = min_distance
         self.max_distance = max_distance
         self.verbose = verbose
-        self.waypoints = []
+        self.waypoints : list[Waypoint] = []
         self.estimated_heading = None
         self.too_far_count = 0
 
@@ -291,6 +288,9 @@ class Schoolbus(EzRobot):
         verbose: bool = False,
     ):
         super().__init__(name, config_file_path, verbose)
+        
+    def lane_center(self, gain : float = 1.0):
+        return self.msg_blob_cmd.angular.z * gain
 
     def yolo_look_for(self, target: str = "person") -> None:
         """Calls the yolo service to look for a specific target class.
