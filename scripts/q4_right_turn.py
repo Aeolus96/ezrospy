@@ -4,7 +4,7 @@
 # 1. Test Goal
 # This test is intended to evaluate if the vehicle is able to make a right turn, merge into the lane and drive
 # within a lane until an obstacle is detected.
-# Figure 8: Qualification Testing. Right Turn
+# Figure 6: Qualification Testing. Right Turn
 # 2. Test Setup
 # The following items shall be placed on the road:
 # o Barrel 1 to indicate starting point at which vehicle is stationary. The Barrel 1 could be placed
@@ -21,7 +21,7 @@
 # 7. Vehicle reaches full stop within 5 ft from the Barrel 2
 # 8. End test run
 # 4. Evaluation
-# Pass Criteria - vehicle is able to turn right, merge into correct lane and stop without hitting abarrel
+# Pass Criteria - vehicle is able to turn right, merge into correct lane and stop without hitting a barrel
 # or crossing boundaries
 
 
