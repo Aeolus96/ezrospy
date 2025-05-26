@@ -1,28 +1,30 @@
 #!/usr/bin/env python3
 
-# Test Q.6 Right Turn
+# Test FIII.3. Intersection Testing. Right Turn
 # 1. Test Goal
-# This test is intended to evaluate if the vehicle is able to make a right turn, merge into the lane and drive
-# within a lane until an obstacle is detected.
-# Figure 8: Qualification Testing. Right Turn
+    # This test is intended to evaluate if a vehicle is able to stop at the 'Stop' traffic sign, make a right turn, merge
+    # into the lane and drive within a lane until an obstacle is detected.
 # 2. Test Setup
-# The following items shall be placed on the road:
-# o Barrel 1 to indicate starting point at which vehicle is stationary. The Barrel 1 could be placed
-# near the stop bar, or several feet away from the stop bar per judges’ decision.
-# o Barrel 2 to indicate an ending point. The barrel is placed about 30 ft away from the stop bar
-# in the right lane
+    # The following items shall be placed on the road:
+    # o Barrel 1 to indicate a starting point at which vehicle is stationary o 'Stop' sign
+    # o Barrel 2 to indicate an ending point
+    # o Duct tape’s dashed line to indicate 30 cm from the perpendicular line
 # 3. Test Script
-# 1. Begin test run
-# 2. Judge pushes 'start' button
-# 3. Vehicle takes off from full stop at Barrel 1
-# 4. Vehicle maintains the target speed (between 3 – 5 mph)
-# 5. Vehicle makes right turn and merges into correct lane
-# 6. Vehicle maintains the target speed (between 3 – 5 mph)
-# 7. Vehicle reaches full stop within 5 ft from the Barrel 2
-# 8. End test run
+    # 1. Begin test run
+    # 2. Judge pushes 'start' button
+    # 3. Vehicle takes off from full stop at Barrel 1
+    # 4. Vehicle maintains the target speed (between 4 – 5 mph)
+    # 5. Vehicle reaches full stop within 30 cm perpendicular white line next to the "Stop" sign. A vehicle’s
+    # bumper should be within two lines at the time when a vehicle reaches full stop.
+    # 6. Vehicle takes off from full stop
+    # 7. Vehicle turns right and merges into correct lane
+    # 8. Vehicle maintains the target speed (between 4 – 5 mph)
+    # 9. Vehicle reaches full stop within 3 ft from the Barrel 2
+    # 10. End test run
 # 4. Evaluation
-# Pass Criteria - vehicle is able to turn right, merge into correct lane and stop without hitting abarrel
-# or crossing boundaries
+    # Fail Criteria – crosses white parallel lines, crosses perpendicular white line, makes a wrong turn, stops
+    # further than 30 cm from a perpendicular line
+    # Penalties – hits barrel at the end of the run (25 points), stops further than 3 ft from the barrel (10 points
 
 
 import actor_ros  # ACTor specific utility functions
