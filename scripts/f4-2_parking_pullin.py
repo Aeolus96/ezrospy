@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
+
 # Test FIV.2. Parking. Pull In
 # 1. Test Goal
   # This test is intended to evaluate if a vehicle is able to pull into a representative parking space. The direction of pull
   # in (right-turn-pull-in or left-turn-pull-in) is selected by the judges. The same direction is repeated for all 3 attempts.
 # 2. Test Setup
   # The following items shall be placed on the road:
-  # o Barrel 1 to indicate starting point at which vehicle is stationary
+  # - Barrel 1 to indicate starting point at which vehicle is stationary
 # 3. Test Script
   # 1. Begin test run
   # 2. Judge pushes 'start' button
@@ -16,6 +17,7 @@
   # 6. End test run
 # 4. Evaluation
   # Fail Criteria – vehicle crosses solid white lines
+
 
 import actor_ros  # ACTor specific utility functions
 import rospy  # ROS Python API
