@@ -7,7 +7,7 @@
     # during a run. There are NO PENALTIES for crossing or moving over a line.
 # 2. Test Setup
     # The following items shall be placed on the road:
-    # o Barrel 1 to indicate starting point at which vehicle is stationary
+    # - Barrel 1 to indicate starting point at which vehicle is stationary
 # 3.Test Script
     # 1. Begin test run
     # 2. Judge pushes 'start' button
