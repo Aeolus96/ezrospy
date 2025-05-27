@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Test Q.5 Left Turn
+# Test Q.3 Left Turn
 # 1. Test Goal
     # This test is intended to evaluate if a vehicle is able to make a left turn across the traffic, merge into
     # expected lane and drive within this lane until an obstacle is detected.
@@ -22,6 +22,7 @@
 # 4. Evaluation
     # Pass Criteria - vehicle is able to turn left, merge into correct lane and stop without hitting abarrel
     # or crossing boundaries
+
 
 import actor_ros  # ACTor specific utility functions
 import rospy  # ROS Python API
