@@ -1,24 +1,28 @@
 #!/usr/bin/env python3
 
-# Test Q.3 Lane Keeping (Go Straight)
+
 # 1. Test Goal
-# This test is intended to evaluate if the vehicle is able to stay within lane boundaries, without wheels
-# crossing the line or driving on the line.
+    # This test is intended to evaluate if a vehicle is able to perform a merge onto a representative highway.
 # 2. Test Setup
-# The following items shall be placed on the road:
-# o Barrel 1 on the side of the road to indicate a starting point at which vehicle is stationary
-# o Barrel 2 about 50 ft away to indicate an ending point.
-# o A duct tape’s mark placed 3 ft from the Barrel 2
+    # The following items shall be placed on the road: 
+    # - Barrel 1 to indicate
+    # a starting point at which vehicle is stationary 
+    # - Barrel 2 to indicate
+    # an ending point
 # 3. Test Script
-# 1. Begin test run
-# 2. Judge pushes 'start' button
-# 3. Vehicle takes off from full stop at Barrel 1
-# 4. Vehicle maintains the target speed (between 4 – 5 mph)
-# 5. Vehicle reaches full stop within 3 ft (+- 2 inches) from the Barrel 2
-# 6. End test run
+    # 1. Begin test run
+    # 2. Judge pushes 'start' button
+    # 3. Vehicle takes off from full stop at Barrel 1
+    # 4. Vehicle maintains the target speed (between 3 – 5 mph)
+    # 5. Vehicle merges into the next lane
+    # 6. Vehicle maintains the target speed (between 3 – 5 mph)
+    # 7. Vehicle reaches full stop within 3 ft from the obstacle (Barrel)
+    # 8. End test run
 # 4. Evaluation
-# Pass Criteria - vehicle stays within lane boundaries without wheels crossing the lines. Vehicle
-# reaches full stop within 3 ft (+- 2 inches) from Barrel 2.
+    # Fail Criteria – crosses white lines
+    # Penalties - hits barrel at the end of the run (25 points), stops further or closer than 3 ft to the barrel
+    # (10 points)
+
 
 import actor_ros  # ACTor specific utility functions
 import rospy  # ROS Python API
