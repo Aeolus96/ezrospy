@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 
+
 # Test FIII.3. Intersection Testing. Right Turn
 # 1. Test Goal
     # This test is intended to evaluate if a vehicle is able to stop at the 'Stop' traffic sign, make a right turn, merge
     # into the lane and drive within a lane until an obstacle is detected.
 # 2. Test Setup
     # The following items shall be placed on the road:
-    # o Barrel 1 to indicate a starting point at which vehicle is stationary o 'Stop' sign
-    # o Barrel 2 to indicate an ending point
-    # o Duct tape’s dashed line to indicate 30 cm from the perpendicular line
+    # - Barrel 1 to indicate a starting point at which vehicle is stationary o 'Stop' sign
+    # - Barrel 2 to indicate an ending point
+    # - Duct tape’s dashed line to indicate 30 cm from the perpendicular line
 # 3. Test Script
     # 1. Begin test run
     # 2. Judge pushes 'start' button
