@@ -1,22 +1,26 @@
 #!/usr/bin/env python3
 
+
 # Test FIV.1 Parking. Pull Out
 # 1. Test Goal
-# This test is intended to evaluate if a vehicle is able to reverse out (or pull out) of the representative parking space.
-# The direction of pull out (right-turn-pull-out or left-turn-pull-out) is selected by the judges. The same direction is
-# repeated for all 3 attempts.
-# Figure 15: Parking. Pull Out
+    # This test is intended to evaluate if a vehicle is able to reverse out (or pull out) of the representative parking space.
+    # The direction of pull out (right-turn-pull-out or left-turn-pull-out) is selected by the judges. The same direction is
+    # repeated for all 3 attempts.
 # 2. Test Setup
-# The following items shall be placed on the road:
-# o Barrel 1 to indicate a starting point at which vehicle is stationary
-# o Barrel 2 to indicate an ending point
+    # The following items shall be placed on the road:
+    # - Barrel 1 to indicate a starting point at which vehicle is stationary
+    # - Barrel 2 to indicate an ending point
 # 3. Test Script
-# 1. Begin test run
-# 2. Judge pushes 'start' button
-# 3. Vehicle takes off from full stop at Barrel 1
-# 4. Vehicle slowly pulls out from the parking spot
-# 5. Vehicle reaches full stop within 3 ft from the Barrel 2
-# 6. End test run
+    # 1. Begin test run
+    # 2. Judge pushes 'start' button
+    # 3. Vehicle takes off from full stop at Barrel 1
+    # 4. Vehicle slowly pulls out from the parking spot
+    # 5. Vehicle reaches full stop within 3 ft from the Barrel 2
+    # 6. End test run
+# 4. Evaluation
+    # Fail Criteria – vehicle crosses solid white lines
+    # Penalties – hits barrel at the end of the run (25 points), stops further than 3 ft from the barrel (10 points)
+
 
 import actor_ros  # ACTor specific utility functions
 import rospy  # ROS Python API

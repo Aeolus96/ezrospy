@@ -1,24 +1,27 @@
 #!/usr/bin/env python3
 
-# Test Q.1 E-Stop Manual
+
+# Test FV.1 Unobstructed STATIC pedestrian detection
 # 1. Test Goal
-# This test is intended to evaluate safety features of Manual E-Stop.
+    # This test evaluates ability of Ego vehicle to stop if a pedestrian is detected within boundaries of a current
+    # lane.
 # 2. Test Setup
-# The following items shall be placed on the road:
-# o Barrel 1 on the side of the road to indicate a starting point at which vehicle is stationary
-# o Barrel 2 on the side of the road to indicate the position where E-Stop button is pressed
-# o Barrel 3 on the side of the road to indicate the maxim distance for the vehicle to come to the complete
-# stop. The distance between Barrel 2 and Barrel 3 is 14 feet
+    # The following items shall be placed on the road:
+    # - Barrel 1 to indicate a starting point at which vehicle is
+    # stationary 
+    # - Mannequin
 # 3. Test Script
-# 1. Begin test run
-# 2. Judge pushes 'start' button
-# 3. Vehicle takes off from full stop at Barrel 1
-# 4. Vehicle maintains the target speed
-# 5. Judge manually pushes E-Stop at Barrel 2
-# 6. Vehicle comes to full stop before reaching Barrel 3.
-# 7. End test run
+    # 1. Begin test run
+    # 2. Judge pushes 'start' button
+    # 3. Vehicle takes off from full stop at Barrel 1
+    # 4. Vehicle maintains the target speed (between 4 – 5 mph)
+    # 5. Vehicle reaches full stop within 5 ft from the Mannequin
+    # 6. End test run
 # 4. Evaluation
-# Pass Criteria - vehicle is able to stop before reaching Barrel 3
+    # Fail Criteria – fails to stop 5 ft from the mannequin, or hits mannequin
+    # Penalties – hits barrel at the end of the run (25 points), stops closer than 5 ft from the Mannequin
+    # (10 points)
+
 
 import actor_ros  # ACTor specific utility functions
 import rospy  # ROS Python API

@@ -1,24 +1,29 @@
 #!/usr/bin/env python3
 
-# Test Q.1 E-Stop Manual
+
 # 1. Test Goal
-# This test is intended to evaluate safety features of Manual E-Stop.
+  # This test is intended to evaluate Ego vehicle’s ability to detect a pothole and safely change lane.
 # 2. Test Setup
-# The following items shall be placed on the road:
-# o Barrel 1 on the side of the road to indicate a starting point at which vehicle is stationary
-# o Barrel 2 on the side of the road to indicate the position where E-Stop button is pressed
-# o Barrel 3 on the side of the road to indicate the maxim distance for the vehicle to come to the complete
-# stop. The distance between Barrel 2 and Barrel 3 is 14 feet
+  # The following items shall be placed on the road:
+  # - Barrel 1 to indicate a starting point at which vehicle is
+  # stationary 
+  # - Pothole (2 feet diameter solid white circle or
+  # plastic mirror) 
+  # - Barrel 2 to indicate an ending point
 # 3. Test Script
-# 1. Begin test run
-# 2. Judge pushes 'start' button
-# 3. Vehicle takes off from full stop at Barrel 1
-# 4. Vehicle maintains the target speed
-# 5. Judge manually pushes E-Stop at Barrel 2
-# 6. Vehicle comes to full stop before reaching Barrel 3.
-# 7. End test run
+  # 1. Begin test run
+  # 2. Judge pushes 'start' button
+  # 3. Vehicle takes off from full stop at Barrel 1
+  # 4. Vehicle maintains the target speed (between 4 – 5 mph)
+  # 5. Vehicle detects pothole and safely moves into the next lane
+  # 6. Vehicle maintains the target speed in the new lane (between 4 – 5 mph)
+  # 7. Vehicle reaches full stop within 3 ft from the Barrel 2
+  # 8. End test run
 # 4. Evaluation
-# Pass Criteria - vehicle is able to stop before reaching Barrel 3
+  # Fail Criteria – run over the pothole
+  # Penalties - hits barrel at the end of the run (25 points), stops further or closer than 3 ft to the Barrel
+  # 2 (10 points)
+
 
 import actor_ros  # ACTor specific utility functions
 import rospy  # ROS Python API

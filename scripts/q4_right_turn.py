@@ -1,28 +1,27 @@
 #!/usr/bin/env python3
 
-# Test Q.6 Right Turn
+# Test Q.4 Right Turn
 # 1. Test Goal
-# This test is intended to evaluate if the vehicle is able to make a right turn, merge into the lane and drive
-# within a lane until an obstacle is detected.
-# Figure 8: Qualification Testing. Right Turn
+    # This test is intended to evaluate if the vehicle is able to make a right turn, merge into the lane and drive
+    # within a lane until an obstacle is detected.
 # 2. Test Setup
-# The following items shall be placed on the road:
-# o Barrel 1 to indicate starting point at which vehicle is stationary. The Barrel 1 could be placed
-# near the stop bar, or several feet away from the stop bar per judges’ decision.
-# o Barrel 2 to indicate an ending point. The barrel is placed about 30 ft away from the stop bar
-# in the right lane
+    # The following items shall be placed on the road:
+    # - Barrel 1 to indicate starting point at which vehicle is stationary. The Barrel 1 could be placed
+    # near the stop bar, or several feet away from the stop bar per judges’ decision.
+    # - Barrel 2 to indicate an ending point. The barrel is placed about 30 ft away from the stop bar
+    # in the right lane
 # 3. Test Script
-# 1. Begin test run
-# 2. Judge pushes 'start' button
-# 3. Vehicle takes off from full stop at Barrel 1
-# 4. Vehicle maintains the target speed (between 3 – 5 mph)
-# 5. Vehicle makes right turn and merges into correct lane
-# 6. Vehicle maintains the target speed (between 3 – 5 mph)
-# 7. Vehicle reaches full stop within 5 ft from the Barrel 2
-# 8. End test run
+    # 1. Begin test run
+    # 2. Judge pushes 'start' button
+    # 3. Vehicle takes off from full stop at Barrel 1
+    # 4. Vehicle maintains the target speed (between 3 – 5 mph)
+    # 5. Vehicle makes right turn and merges into correct lane
+    # 6. Vehicle maintains the target speed (between 3 – 5 mph)
+    # 7. Vehicle reaches full stop within 5 ft from the Barrel 2
+    # 8. End test run
 # 4. Evaluation
-# Pass Criteria - vehicle is able to turn right, merge into correct lane and stop without hitting abarrel
-# or crossing boundaries
+    # Pass Criteria - vehicle is able to turn right, merge into correct lane and stop without hitting a barrel
+    # or crossing boundaries
 
 
 import actor_ros  # ACTor specific utility functions

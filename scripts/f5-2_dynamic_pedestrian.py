@@ -1,24 +1,34 @@
 #!/usr/bin/env python3
 
-# Test Q.1 E-Stop Manual
+
+# Test FV.2 Obstructed DYNAMIC pedestrian detection
 # 1. Test Goal
-# This test is intended to evaluate safety features of Manual E-Stop.
+    # This test evaluates ability of Ego vehicle to stop if an obstructed by barrel pedestrian (mannequin) suddenly
+    # starts crossing an Ego’s vehicle lane.
 # 2. Test Setup
-# The following items shall be placed on the road:
-# o Barrel 1 on the side of the road to indicate a starting point at which vehicle is stationary
-# o Barrel 2 on the side of the road to indicate the position where E-Stop button is pressed
-# o Barrel 3 on the side of the road to indicate the maxim distance for the vehicle to come to the complete
-# stop. The distance between Barrel 2 and Barrel 3 is 14 feet
+    # - Barrel 1 to indicate a starting point at which vehicle is
+    # stationary 
+    # - Barrel 2 placed in adjacent lane, with Mannequin
+    # behind it 
+    # - Barrel 3 to indicate an ending point 
+    # - Mannequin
 # 3. Test Script
-# 1. Begin test run
-# 2. Judge pushes 'start' button
-# 3. Vehicle takes off from full stop at Barrel 1
-# 4. Vehicle maintains the target speed
-# 5. Judge manually pushes E-Stop at Barrel 2
-# 6. Vehicle comes to full stop before reaching Barrel 3.
-# 7. End test run
+    # 1. Begin test run
+    # 2. Judge 1 pushes 'start' button
+    # 3. Vehicle takes off from full stop at Barrel 1
+    # 4. Vehicle maintains the target speed (between 3 – 5 mph)
+    # 5. Judge 2 rolls out Mannequin from behind Barrel 2 and stops Mannequin in Ego’s vehicle lane
+    # 6. Vehicle reaches full stop within 5 ft from the Mannequin
+    # 7. Judge 2 pulls back Mannequin behind Barrel 2
+    # 8. Vehicle takes off from the full stop
+    # 9. Vehicle maintains the target speed (between 3 – 5 mph)
+    # 10. Vehicle reaches full stop within 3 ft from the Barrel 2
+    # 11. End test run
 # 4. Evaluation
-# Pass Criteria - vehicle is able to stop before reaching Barrel 3
+    # Fail Criteria – fails to stop 5 ft from the mannequin, or hits mannequin
+    # Penalties – hits barrel at the end of the run (25 points), stops closer than 5 ft from the Mannequin (10
+    # points)
+
 
 import actor_ros  # ACTor specific utility functions
 import rospy  # ROS Python API

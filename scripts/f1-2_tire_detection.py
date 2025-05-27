@@ -1,5 +1,22 @@
 #!/usr/bin/env python3
 
+# Test FI.2 Tire Detection
+# 1. Test Goal
+    # This test is intended to evaluate detection of a small item present in a current lane using traditional
+    # Machine Vision algorithms. A GUI interface with extracted shape of a tire MUST be present
+    # during a run. There are NO PENALTIES for crossing or moving over a line.
+# 2. Test Setup
+    # The following items shall be placed on the road:
+    # - Barrel 1 to indicate starting point at which vehicle is stationary
+# 3.Test Script
+    # 1. Begin test run
+    # 2. Judge pushes 'start' button
+    # 3. The extracted tire is present on the screen
+    # 4. End test run
+# 4. Evaluation
+    # Fail Criteria – no GUI interface is present during the run, incorrect identification of the tire
+    # Penalties – no penalties for crossing or moving over the lines, if vehicle is moving during the test
+
 import actor_ros  # ACTor specific utility functions
 import rospy  # ROS Python API
 
