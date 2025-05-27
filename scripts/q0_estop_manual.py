@@ -15,8 +15,8 @@ from modules.ezros_robot import Schoolbus
     # This test is intended to evaluate safety features of Manual E-Stop.
 # 2. Test Setup
     # The following items shall be placed on the road:
-    # o Barrel 1 on the side of the road to indicate a starting point at which vehicle is stationary
-    # o Barrel 2 on the side of the road to indicate the position where E-Stop button is pressed
+    # - Barrel 1 on the side of the road to indicate a starting point at which vehicle is stationary
+    # - Barrel 2 on the side of the road to indicate the position where E-Stop button is pressed
 # 3. Test Script
     # 1. Begin test run
     # 2. Judge pushes 'start' button
