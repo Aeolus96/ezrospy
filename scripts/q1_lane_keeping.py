@@ -2,23 +2,23 @@
 
 # Test Q.3 Lane Keeping (Go Straight)
 # 1. Test Goal
-# This test is intended to evaluate if the vehicle is able to stay within lane boundaries, without wheels
-# crossing the line or driving on the line.
+    # This test is intended to evaluate if the vehicle is able to stay within lane boundaries, without wheels
+    # crossing the line or driving on the line.
 # 2. Test Setup
-# The following items shall be placed on the road:
-# o Barrel 1 on the side of the road to indicate a starting point at which vehicle is stationary
-# o Barrel 2 about 50 ft away to indicate an ending point.
-# o A duct tape’s mark placed 3 ft from the Barrel 2
+    # The following items shall be placed on the road:
+    # o Barrel 1 on the side of the road to indicate a starting point at which vehicle is stationary
+    # o Barrel 2 about 50 ft away to indicate an ending point.
+    # o A duct tape’s mark placed 3 ft from the Barrel 2
 # 3. Test Script
-# 1. Begin test run
-# 2. Judge pushes 'start' button
-# 3. Vehicle takes off from full stop at Barrel 1
-# 4. Vehicle maintains the target speed (between 4 – 5 mph)
-# 5. Vehicle reaches full stop within 3 ft (+- 2 inches) from the Barrel 2
-# 6. End test run
+    # 1. Begin test run
+    # 2. Judge pushes 'start' button
+    # 3. Vehicle takes off from full stop at Barrel 1
+    # 4. Vehicle maintains the target speed (between 4 – 5 mph)
+    # 5. Vehicle reaches full stop within 3 ft (+- 2 inches) from the Barrel 2
+    # 6. End test run
 # 4. Evaluation
-# Pass Criteria - vehicle stays within lane boundaries without wheels crossing the lines. Vehicle
-# reaches full stop within 3 ft (+- 2 inches) from Barrel 2.
+    # Pass Criteria - vehicle stays within lane boundaries without wheels crossing the lines. Vehicle
+    # reaches full stop within 3 ft (+- 2 inches) from Barrel 2.
 
 import actor_ros  # ACTor specific utility functions
 import rospy  # ROS Python API
