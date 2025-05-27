@@ -1,6 +1,33 @@
 #!/usr/bin/env python3
 
 
+# Test FVI.2 Curved Road Evaluation. Lane Changing
+# 1. Test Goal
+    # This test is intended to evaluate if a vehicle is able to perform a lane change on the curved road if
+    # obstacles are detected. This test consists of 4 possible case scenarios: changing right lane on the left
+    # curve, changing left lane on the left curve, changing right lane on the right curve and changing left lane
+    # on the right curve. Any of above scenarios could be chosen as this year’s test.
+# 2. Test Setup
+    # The following items shall be placed on the road:
+    # - Barrel 1 to indicate a starting point at which vehicle is
+    # stationary 
+    # - Barrel 2 to indicate an obstacle in current lane 
+    # - Barrel 3 to indicate an ending point
+# 3. Test Script
+    # 1. Begin test run
+    # 2. Judge pushes 'start' button
+    # 3. Vehicle takes off from full stop at Barrel 1
+    # 4. Vehicle maintains the target speed (between 3 – 5 mph)
+    # 5. Vehicle detects obstacle (Barrel 2), and safely moves into the next lane
+    # 6. Vehicle maintains the target speed in the new lane (between 3 – 5 mph)
+    # 7. Vehicle reaches full stop within 3 ft from the obstacle (Barrel 3)
+    # 8. End test run
+# 4. Evaluation
+    # Fail Criteria – crosses white solid line, hits Barrel 2
+    # Penalties - hits Barrel 3 at the end of the run (25 points), stops further or closer than 3 ft to the Barrel
+    # 2 (10 points)
+
+
 import actor_ros  # ACTor specific utility functions
 import rospy  # ROS Python API
 
