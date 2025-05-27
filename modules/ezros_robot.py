@@ -58,8 +58,8 @@ class EzRobot(EzRosNode):
         from geometry_msgs.msg import Twist  # ROS Message Type
 
         msg = Twist()  # Create message and publish
-        msg.linear.x = speed
-        msg.angular.z = angle
+        msg.linear.x = float(speed)
+        msg.angular.z = float(angle)
         self.pub_twist.publish(msg)
 
     def drive_for(
@@ -290,7 +290,7 @@ class Schoolbus(EzRobot):
         super().__init__(name, config_file_path, verbose)
         
     def lane_center(self, gain : float = 1.0):
-        return self.msg_blob_cmd.angular.z * gain
+        return self.msg_blob_cmd.angular.z * gain * -1.0
 
     def yolo_look_for(self, target: str = "person") -> None:
         """Calls the yolo service to look for a specific target class.
