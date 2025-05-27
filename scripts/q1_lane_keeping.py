@@ -6,9 +6,9 @@
     # crossing the line or driving on the line.
 # 2. Test Setup
     # The following items shall be placed on the road:
-    # o Barrel 1 on the side of the road to indicate a starting point at which vehicle is stationary
-    # o Barrel 2 about 50 ft away to indicate an ending point.
-    # o A duct tape’s mark placed 3 ft from the Barrel 2
+    # - Barrel 1 on the side of the road to indicate a starting point at which vehicle is stationary
+    # - Barrel 2 about 50 ft away to indicate an ending point.
+    # - A duct tape’s mark placed 3 ft from the Barrel 2
 # 3. Test Script
     # 1. Begin test run
     # 2. Judge pushes 'start' button
