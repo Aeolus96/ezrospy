@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
+
 # 1. Test Goal
     # This test is intended to evaluate if a vehicle is able to stop at the 'Stop' traffic sign, make a left turn across
     # the traffic, merge into expected lane and drive within this lane until an obstacle is detected.
 # 2. Test Setup
     # The following items shall be placed on the road:
-    # o Barrel 1 to indicate a starting point at which vehicle is stationary o 'Stop' sign o 'One Way' sign
-    # o Barrel 2 to indicate an ending point
-    # o Duct tape’s dashed line to indicate 30 cm from the perpendicular line
+    # - Barrel 1 to indicate a starting point at which vehicle is stationary o 'Stop' sign o 'One Way' sign
+    # - Barrel 2 to indicate an ending point
+    # - Duct tape’s dashed line to indicate 30 cm from the perpendicular line
 # 3. Test Script
     # 1. Begin test run
     # 2. Judge pushes 'start' button
@@ -24,6 +25,7 @@
     # Fail Criteria – crosses white parallel lines, crosses perpendicular white line, makes a wrong turn, stops
     # further than 30 cm from a perpendicular line
     # Penalties – hits barrel at the end of the run (25 points), stops further than 3 ft from the barrel (10 points)
+
 
 import actor_ros  # ACTor specific utility functions
 import rospy  # ROS Python API
