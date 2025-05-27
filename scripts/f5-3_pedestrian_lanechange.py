@@ -1,24 +1,36 @@
 #!/usr/bin/env python3
 
-# Test Q.1 E-Stop Manual
+
+# Test FV.3 STATIC Pedestrian Detection. Lane Changing
 # 1. Test Goal
-# This test is intended to evaluate safety features of Manual E-Stop.
+    # This test imitates a situation of a broken vehicle in a current lane with STATIC pedestrian standing in
+    # FRONT of barrel(s) in the same lane as Ego vehicle. Ego vehicle must slow down, and safely change into
+    # an adjacent lane.
 # 2. Test Setup
-# The following items shall be placed on the road:
-# o Barrel 1 on the side of the road to indicate a starting point at which vehicle is stationary
-# o Barrel 2 on the side of the road to indicate the position where E-Stop button is pressed
-# o Barrel 3 on the side of the road to indicate the maxim distance for the vehicle to come to the complete
-# stop. The distance between Barrel 2 and Barrel 3 is 14 feet
+    # There will be a distance of approximately 85 ft between the mannequin/barrel when mannequin will start
+    # crossing the road.
+    # The following items shall be placed on the road:
+    # - Barrel 1 to indicate starting point at which vehicle is
+    # stationary 
+    # - Mannequin to indicate obstacle
+    # - Barrels 1 and 2 to indicate a broken vehicle in a current
+    # lane 
+    # - Barrel 3 to indicate end of a run
 # 3. Test Script
-# 1. Begin test run
-# 2. Judge pushes 'start' button
-# 3. Vehicle takes off from full stop at Barrel 1
-# 4. Vehicle maintains the target speed
-# 5. Judge manually pushes E-Stop at Barrel 2
-# 6. Vehicle comes to full stop before reaching Barrel 3.
-# 7. End test run
+    # 1. Begin test run
+    # 2. Judge pushes 'start' button
+    # 3. Vehicle takes off from full stop at Barrel 1
+    # 4. Vehicle maintains the target speed (between 3 -5 mph)
+    # 5. Vehicle detects Mannequin
+    # 6. Vehicle performs safe transition into the next lane 10 ft away from the Mannequin
+    # 7. Vehicle maintains the target speed in the new lane (between 3-5 mph)
+    # 8. Vehicle reaches full stop within 3 ft from the obstacle (Barrel 3)
+    # 9. End test run
 # 4. Evaluation
-# Pass Criteria - vehicle is able to stop before reaching Barrel 3
+    # Fail Criteria –hits mannequin, crosses white solid line
+    # Penalties – hits barrel at the end of the run (25 points), lane change completed closer than 10 feet from the
+    # obstacle (10 points)
+
 
 import actor_ros  # ACTor specific utility functions
 import rospy  # ROS Python API
