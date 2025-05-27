@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Test Q.3 Lane Keeping (Go Straight)
+# Test Q.1 Lane Keeping (Go Straight)
 # 1. Test Goal
     # This test is intended to evaluate if the vehicle is able to stay within lane boundaries, without wheels
     # crossing the line or driving on the line.
