@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 
+
 # Test FV.1 Unobstructed STATIC pedestrian detection
 # 1. Test Goal
     # This test evaluates ability of Ego vehicle to stop if a pedestrian is detected within boundaries of a current
     # lane.
 # 2. Test Setup
     # The following items shall be placed on the road:
-    # o Barrel 1 to indicate a starting point at which vehicle is
-    # stationary o Mannequin
+    # - Barrel 1 to indicate a starting point at which vehicle is
+    # stationary 
+    # - Mannequin
 # 3. Test Script
     # 1. Begin test run
     # 2. Judge pushes 'start' button
@@ -19,6 +21,7 @@
     # Fail Criteria – fails to stop 5 ft from the mannequin, or hits mannequin
     # Penalties – hits barrel at the end of the run (25 points), stops closer than 5 ft from the Mannequin
     # (10 points)
+
 
 import actor_ros  # ACTor specific utility functions
 import rospy  # ROS Python API
