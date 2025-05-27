@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 # Test FII.1 Stop Sign Detection
 # 1. Test Goal
     # This test is intended to evaluate Stop Sign classification detection and accuracy. Any type of
@@ -9,8 +10,9 @@
     # GUI interface shell display a relevant classification as “Stop Sign” or “Unknown”. There are NO
     # PENALTIES for crossing or moving over a lane.
 # 2. Test Setup
-    # o Barrel 1 to indicate starting point at which vehicle is
-    # stationary o 3 different “Stop” signs are being tested
+    # - Barrel 1 to indicate starting point at which vehicle is
+    # stationary 
+    # - 3 different “Stop” signs are being tested
     # randomly
 # 3. Test Script
     # 1. Begin test run
@@ -25,6 +27,7 @@
     # keyboard touching between the sign changes. To pass the test, all 3 signs must be correctly
     # identified.
     # Penalties – no penalties for crossing or moving over the lines, if vehicle is moving during the test
+
 
 import actor_ros  # ACTor specific utility functions
 import rospy  # ROS Python API
