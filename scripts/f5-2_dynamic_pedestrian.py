@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 # Test FV.2 Obstructed DYNAMIC pedestrian detection
 # 1. Test Goal
     # This test evaluates ability of Ego vehicle to stop if an obstructed by barrel pedestrian (mannequin) suddenly
@@ -27,6 +28,7 @@
     # Fail Criteria – fails to stop 5 ft from the mannequin, or hits mannequin
     # Penalties – hits barrel at the end of the run (25 points), stops closer than 5 ft from the Mannequin (10
     # points)
+
 
 import actor_ros  # ACTor specific utility functions
 import rospy  # ROS Python API
