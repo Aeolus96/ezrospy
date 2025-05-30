@@ -5,6 +5,8 @@ Defined Robot Types and Related Interfaces
 
 --------------------------------------------------------------------------------------------------------------------"""
 
+import time
+from copy import deepcopy
 from math import asin, atan2, cos, degrees, radians, sin, sqrt
 
 import rclpy  # type: ignore  # noqa: F401
@@ -27,7 +29,7 @@ class EzRobot(EzRosNode):
         self.create_timer(0.01, self.update_speed)  # 100 Hz
         self.waypoint = Waypoint(0.0, 0.0)  # Default Waypoint is kept at (0,0) for simplicity
         self.heading = 0.0  # Default heading is kept at 0 for simplicity
-        self.heading_estimator = HeadingEstimator()
+        self.heading_estimator = HeadingEstimator(verbose=verbose)
         self.create_timer(0.1, self.update_gps)  # 10 Hz
 
     def update_speed(self) -> None:
@@ -172,30 +174,14 @@ class Waypoint:
         delta_lambda = lambda_2 - lambda_1
         x = sin(delta_lambda) * cos(phi_2)
         y = cos(phi_1) * sin(phi_2) - sin(phi_1) * cos(phi_2) * cos(delta_lambda)
+        # print(f"Absolute: {(degrees(atan2(x, y)) + 360) % 360}")
         return (degrees(atan2(x, y)) + 360) % 360  # Normalized to 0-360
-
-    # TODO: Implement relative bearing inside robot NOT in waypoint class
-    # def relative_bearing_with(self, goal: "Waypoint") -> float:
-    #     """Returns the relative bearing from the current heading to the goal waypoint in degrees\n
-    #     WARNING: Only valid if current heading is known"""
-
-    #     if self.heading is None:
-    #         print("Waypoint: Please specify current heading to calculate relative bearing")
-    #         return 0
-    #     elif goal.heading is None:
-    #         print("Waypoint: Please specify goal heading to calculate relative bearing")
-    #         return 0
-    #     absolute_bearing = self.absolute_bearing_with(goal)
-    #     relative_bearing = self.heading - absolute_bearing
-    #     if relative_bearing < -180:  # Normalize to -180 or 180
-    #         relative_bearing += 360
-    #     elif relative_bearing > 180:
-    #         relative_bearing -= 360
-    #     return relative_bearing
 
     def __str__(self) -> str:
         """Returns a string representation of the waypoint"""
-        return f"Waypoint: {self.latitude:.6f}, {self.longitude:.6f}, {self.heading:.3f}"
+
+        tmp_heading = self.heading if self.heading is not None else 0
+        return f"Waypoint: {self.latitude:.6f}, {self.longitude:.6f}, {tmp_heading:.3f}"
 
     # End of Class ----------------------------------------------------------------------------------------------------
 
@@ -203,7 +189,7 @@ class Waypoint:
 class HeadingEstimator:
     """Class to calculate heading based on recent waypoints"""
 
-    def __init__(self, max_history=5, min_distance=0.5, max_distance=100, verbose=False) -> None:
+    def __init__(self, max_history=5, min_distance=0.1, max_distance=100, verbose=False) -> None:
         """Initialize with a maximum history size for waypoints\n
         Minimum distance between waypoints in meters"""
 
@@ -211,7 +197,7 @@ class HeadingEstimator:
         self.min_distance = min_distance
         self.max_distance = max_distance
         self.verbose = verbose
-        self.waypoints : list[Waypoint] = []
+        self.waypoints: list[Waypoint] = []
         self.estimated_heading = None
         self.too_far_count = 0
 
@@ -219,7 +205,7 @@ class HeadingEstimator:
         """Add a waypoint to the history and remove old waypoints if necessary"""
 
         if len(self.waypoints) == 0:
-            self.waypoints.append(waypoint)
+            self.waypoints.append(deepcopy(waypoint))
             if self.verbose:
                 print("HeadingEstimator: First waypoint added")
             return
@@ -235,7 +221,7 @@ class HeadingEstimator:
                 self.reset_history()
             return
 
-        self.waypoints.append(waypoint)
+        self.waypoints.append(deepcopy(waypoint))
 
         if len(self.waypoints) > self.max_history:
             self.waypoints.pop(0)
@@ -288,8 +274,22 @@ class Schoolbus(EzRobot):
         verbose: bool = False,
     ):
         super().__init__(name, config_file_path, verbose)
+        self.yolo_count = 0
+        self.yolo_size = 0
+        self.waypoints = None
+        time.sleep(1.0)
+        self.update_gps()
+
+    def update_gps(self) -> None:
+        """Updates current GPS latitude and longitude (decimal degrees) using subscribed NavSatFix message"""
+
+        latitude = self.msg_gps.latitude
+        longitude = self.msg_gps.longitude
+        self.waypoint.update(latitude, longitude)  # Update self waypoint
+        self.heading = (((self.msg_imu.orientation.z * -180) + 180) + 330) % 360  # Heading from IMU in degrees
+        # -1 to 1 > 180 to -180 > 0 to 360 > offset to North
         
-    def lane_center(self, gain : float = 1.0):
+    def lane_center(self, gain: float = 1.0):
         return self.msg_blob_cmd.angular.z * gain * -1.0
 
     def yolo_look_for(self, target: str = "person") -> None:
@@ -314,3 +314,100 @@ class Schoolbus(EzRobot):
                     print(f"Found {self.yolo_count}x {self.srv_yolo_req.target}, {self.yolo_size}% of image")
         except Exception as e:
             print(f"- ! - ! - ! - !- Exception in yolo_callback - ! - ! - ! - !-\n{e}")
+
+    def object_in_zone(self, zone: str, min_dist: float = 0.0, max_dist: float = 5.0) -> bool:
+        """Returns True if object is in zone, False otherwise"""
+
+        # within_zone = eval(f"self.msg_{zone}.data > {min_dist} and self.msg_{zone}.data < {max_dist}")
+        distance = eval(f"self.msg_{zone}.data")
+        within_zone = distance < max_dist and distance > min_dist
+        print(f"Object in {zone}:: {distance} ::{within_zone}")
+        return within_zone
+
+    def update_current_waypoint(self) -> None:
+        """Updates self Waypoint instance from the current vehicle status"""
+
+        self.update_gps()
+
+        # self.waypoint.update(self.msg_gps.latitude, self.msg_gps.longitude, self.msg_navheading.orientation.z)
+
+    def read_waypoints(self, file_path: str = None, verbose: bool = False) -> list:
+        """Reads waypoints from saved YAML file"""
+        from modules.ezros_tools import YAMLReader
+
+        file = YAMLReader(file_path=file_path)
+        file.read(file_path=file_path)
+
+        waypoint_list = []
+        for i in range(len(file)):
+            waypoint = eval(f"file.waypoint{i}")
+            waypoint_list.append(
+                Waypoint(latitude=waypoint[0].lat, longitude=waypoint[1].long, heading=waypoint[2].heading)
+            )
+
+        if verbose:
+            print(waypoint_list)
+
+        return waypoint_list
+
+    def relative_bearing_with(self, goal: "Waypoint") -> float:
+        """Returns the relative bearing from the current heading to the goal waypoint in degrees"""
+
+        relative_bearing = self.heading - self.waypoint.absolute_bearing_with(goal)  # degrees
+
+        # Normalize to 0 - 360 only when over -180 or 180
+        if relative_bearing < -180:
+            relative_bearing += 360
+        elif relative_bearing > 180:
+            relative_bearing -= 360
+
+        # print(f"Relative: {relative_bearing}")
+        return relative_bearing
+
+    def waypoint_in_range(self, goal_waypoint: "Waypoint" = None, radius: float = 3.0) -> bool:
+        """Returns True if GPS coordinates are within the specified radius (meters)"""
+
+        if goal_waypoint is None:
+            print("Please specify a waypoint")
+            return False
+
+        self.update_current_waypoint()  # Update current waypoint position
+        distance = self.waypoint.distance_to(goal_waypoint)
+        # print(distance)
+
+        return distance < radius  # or distance is within radius
+
+    def follow_waypoints(self, radius: float = 1.5, gain: float = 1.0, verbose: bool = False) -> float:
+        """Returns the angle needed to follow the waypoint trajectory using a list of Waypoints(class). Make sure the list is a defined object and ordered correctly"""
+
+        if self.waypoints is None:
+            print("Please specify a list of waypoints @ self.waypoints")
+            return 0
+
+        num_waypoints = len(self.waypoints)
+        # print(f"Waypoints Remaining: {num_waypoints}")
+        print(f"Heading: {self.heading}")
+
+        if num_waypoints > 0:  # If there are waypoints available
+            self.update_current_waypoint()  # Update current waypoint position
+
+            # Calculate target angle based on the average relative angle of the first n waypoints
+            n = min(10, num_waypoints)
+            target_angle_sum = 0
+            for i in range(n):
+                target_angle_sum += self.relative_bearing_with(self.waypoints[i]) * gain
+
+            target_angle = target_angle_sum / n  # Average target angle
+
+            # Check if waypoint is within specified radius
+            if self.waypoint_in_range(goal_waypoint=self.waypoints[0], radius=radius):
+                if verbose:
+                    print("Reached ", self.waypoints[0])
+                self.waypoints.pop(0)  # remove waypoint because it has been sufficiently reached
+
+            return -radians(target_angle)
+
+        else:  # If there are no more waypoints in the list
+            if verbose:
+                print("--final waypoint reached--")
+            return 0

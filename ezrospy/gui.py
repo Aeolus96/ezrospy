@@ -16,8 +16,8 @@ import modules.ezros_tools as ezros_tools
 # Rosboard Setup ------------------------------------------------------------------------------------------------------
 ip_address = ezros_tools.get_local_ip()
 rosboard_port = 8888
-rosboard_url = f"http://{ip_address}:{rosboard_port}/"
-
+# rosboard_url = f"http://{ip_address}:{rosboard_port}/"
+rosboard_url = f"http://192.168.0.3:{rosboard_port}/"
 
 # Script Player Setup -------------------------------------------------------------------------------------------------
 scripts_directory = ezros_tools.package_path("ezrospy") + "/scripts/"
@@ -222,7 +222,8 @@ def ros_main():
 
 app.on_startup(lambda: threading.Thread(target=ros_main).start())
 ui_run.APP_IMPORT_STRING = f"{__name__}:app"
-ui.run(show=False, port=8889, uvicorn_reload_dirs=str(Path(__file__).parent.resolve()), favicon="🤖")
+# ui.run(show=False, port=8889, uvicorn_reload_dirs=str(Path(__file__).parent.resolve()), favicon="🤖")
+ui.run(show=False, reload=False, port=8889, favicon="🤖")
 
 
 # ---------------------------------------------------------------------------------------------------------------------

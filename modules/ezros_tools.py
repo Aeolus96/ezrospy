@@ -14,13 +14,12 @@ import signal
 import socket
 import subprocess
 import time
-from threading import Thread
 from functools import partial
+from threading import Thread
 
 import rclpy  # type: ignore  # noqa: F401
 import yaml
 from munch import Munch, munchify, unmunchify
-
 from rclpy.node import Node  # type: ignore
 
 # End of Imports ------------------------------------------------------------------------------------------------------
@@ -190,9 +189,13 @@ class YAMLReader(Munch):
         if file_path is None:
             raise ValueError("YAML: No file path provided")
         try:
-            with open(file_path, "r") as file:
-                print(f"YAML: Loading file '{file_path}'")
-                self.update(munchify(yaml.safe_load(file)))
+            if os.path.exists(file_path):
+                with open(file_path, "r") as file:
+                    print(f"YAML: Loading file '{file_path}'")
+                    self.update(munchify(yaml.safe_load(file)))
+            else:
+                with open(file_path, "w") as file:
+                    print(f"YAML: Makeing new file '{file_path}'")
         except Exception as e:
             print(f"YAML: Failed to load file '{file_path}': {e}")
 

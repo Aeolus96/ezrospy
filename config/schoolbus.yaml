@@ -16,7 +16,7 @@ subs:
     msg_file: nav_msgs.msg
     msg_type: Odometry
   - name: msg_gps
-    topic: /ublox/fix
+    topic: /ublox_gps_node/fix
     msg_file: sensor_msgs.msg
     msg_type: NavSatFix
   - name: msg_blob_cmd
@@ -31,7 +31,22 @@ subs:
     topic: /navheading
     msg_file: sensor_msgs.msg
     msg_type: Imu
-
+  - name: msg_front
+    topic: /region/front/closest
+    msg_file: std_msgs.msg
+    msg_type: Float32
+  - name: msg_frontleft
+    topic: /region/frontleft/closest
+    msg_file: std_msgs.msg
+    msg_type: Float32
+  - name: msg_frontright
+    topic: /region/frontright/closest
+    msg_file: std_msgs.msg
+    msg_type: Float32
+  - name: msg_rear
+    topic: /region/rear/closest
+    msg_file: std_msgs.msg
+    msg_type: Float32
 
 service_calls: # ROS Service calls
   - name: srv_yolo # Name of client. Request is this name + _req
