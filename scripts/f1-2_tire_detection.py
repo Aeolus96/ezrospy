@@ -1,42 +1,65 @@
 #!/usr/bin/env python3
+import time  # noqa: F401
 
-# Test FI.2 Tire Detection
+import rclpy  # type: ignore  # noqa: F401
+from rclpy.executors import ExternalShutdownException  # type: ignore  # noqa: F401
+
+from modules.ezros_robot import HeadingEstimator, Schoolbus
+
+# End of Imports ------------------------------------------------------------------------------------------------------
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Test Q.1 E-Stop Manual
 # 1. Test Goal
-    # This test is intended to evaluate detection of a small item present in a current lane using traditional
-    # Machine Vision algorithms. A GUI interface with extracted shape of a tire MUST be present
-    # during a run. There are NO PENALTIES for crossing or moving over a line.
+# This test is intended to evaluate safety features of Manual E-Stop.
 # 2. Test Setup
-    # The following items shall be placed on the road:
-    # - Barrel 1 to indicate starting point at which vehicle is stationary
-# 3.Test Script
-    # 1. Begin test run
-    # 2. Judge pushes 'start' button
-    # 3. The extracted tire is present on the screen
-    # 4. End test run
+# The following items shall be placed on the road:
+# o Barrel 1 on the side of the road to indicate a starting point at which vehicle is stationary
+# o Barrel 2 on the side of the road to indicate the position where E-Stop button is pressed
+# o Barrel 3 on the side of the road to indicate the maxim distance for the vehicle to come to the complete
+# stop. The distance between Barrel 2 and Barrel 3 is 14 feet
+# 3. Test Script
+# 1. Begin test run
+# 2. Judge pushes 'start' button
+# 3. Vehicle takes off from full stop at Barrel 1
+# 4. Vehicle maintains the target speed
+# 5. Judge manually pushes E-Stop at Barrel 2
+# 6. Vehicle comes to full stop before reaching Barrel 3.
+# 7. End test run
 # 4. Evaluation
-    # Fail Criteria – no GUI interface is present during the run, incorrect identification of the tire
-    # Penalties – no penalties for crossing or moving over the lines, if vehicle is moving during the test
+# Pass Criteria - vehicle is able to stop before reaching Barrel 3
 
-import actor_ros  # ACTor specific utility functions
-import rospy  # ROS Python API
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-estop = actor_ros.actor_tools.EStopManager()  # E-Stop Manager instance
 
-actor = actor_ros.scripting_tools.ActorScriptTools()  # ACTor Scripting Tools instance
-# ^ This starts everything that needs to be up and running for the script
-# ---------------------------------------------------------------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------------------------------
+# Main Script ---------------------------------------------------------------------------------------------------------
+def script():
+    robot = Schoolbus(verbose=True)
+    robot.print_title("Tire Detection")
+    for _ in range(60):
+        robot.yolo_look_for("tire")
+        time.sleep(1)
+        
+    robot.print_title("Test Completed")
 
-actor.print_title("F1.2 Tire Detection")
 
-actor.print_highlights("Detecting Pedestrians")
+    time.sleep(20)
+    robot.destroy_node()  # DESTROY EVERYTHING!!!!!
 
-count = 0
 
-while count < 300:
-    actor.yolo_look_for(tire=True, size=100)
-    count += 1
-    rospy.sleep(0.1)
+# Main Executer (No need to change) -----------------------------------------------------------------------------------
+def main(args=None):  # <<< ROS entry point
+    try:
+        rclpy.init(args=args)
+        script()
+        exit(0)
 
-actor.print_highlights("Tire Detection Complete!")
+        # rclpy.shutdown()
+
+    except (ExternalShutdownException, KeyboardInterrupt):
+        pass
+
+
+if __name__ == "__main__":
+    main()

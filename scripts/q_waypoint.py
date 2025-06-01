@@ -4,7 +4,7 @@ import time  # noqa: F401
 import rclpy  # type: ignore  # noqa: F401
 from rclpy.executors import ExternalShutdownException  # type: ignore  # noqa: F401
 
-from modules.ezros_robot import HeadingEstimator, Schoolbus
+from modules.ezros_robot import HeadingEstimator, Schoolbus, Waypoint
 
 # End of Imports ------------------------------------------------------------------------------------------------------
 
@@ -31,30 +31,30 @@ from modules.ezros_robot import HeadingEstimator, Schoolbus
 # Pass Criteria - vehicle is able to stop before reaching Barrel 3
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-WAYPOINT_YAML_PATH = "/home/dev/waypoints/merging.yaml"
+waypoint = Waypoint(latitude=42.668219799999996, longitude=-83.2184721)
 
 
 # Main Script ---------------------------------------------------------------------------------------------------------
 def script():
     robot = Schoolbus(verbose=True)
-    robot.print_title("Merging")
-    robot.waypoints = robot.read_waypoints(WAYPOINT_YAML_PATH)
+    robot.print_title("Qualification Waypoint")
+    robot.waypoints = [waypoint]
     # robot.drive_for(speed=1, angle=robot.lane_center, duration=30)
 
     # print(robot.waypoint)
     # print(robot.waypoints[-1])
-    # end_waypoint = robot.waypoints[-1]
+    end_waypoint = robot.waypoints[-1]
 
     robot.drive_for(
         speed=1.0,
         angle=robot.follow_waypoints,
-        angle_kwargs={"radius": 1.5},
-        end_function=robot.object_in_zone,
-        end_function_kwargs={"zone": "front", "min_dist": 0, "max_dist": 2.1},
+        angle_kwargs={"radius": 1.0},
+        end_function=robot.waypoint_in_range,
+        end_function_kwargs={"goal_waypoint": waypoint, "radius": 0.4},
         # duration=10,
     )
 
-    # robot.stop(duration=0.1)
+    robot.stop()
 
     robot.print_title("Test Completed")
 

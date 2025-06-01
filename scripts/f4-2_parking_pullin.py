@@ -18,51 +18,66 @@
 # 4. Evaluation
   # Fail Criteria – vehicle crosses solid white lines
 
+#!/usr/bin/env python3
+import time  # noqa: F401
 
-import actor_ros  # ACTor specific utility functions
-import rospy  # ROS Python API
+import rclpy  # type: ignore  # noqa: F401
+from rclpy.executors import ExternalShutdownException  # type: ignore  # noqa: F401
 
-estop = actor_ros.actor_tools.EStopManager()  # E-Stop Manager instance
+from modules.ezros_robot import Schoolbus
 
-actor = actor_ros.scripting_tools.ActorScriptTools()  # ACTor Scripting Tools instance
-# ^ This starts everything that needs to be up and running for the script
-# ---------------------------------------------------------------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------------------------------
 
-actor.print_title("F4.2 Parking Pull In")
+# Main Script ---------------------------------------------------------------------------------------------------------
+def script():
+    robot = Schoolbus()
+    robot.print_title("Test Left Turn")
 
-#actor.print_highlights("Go Forward")
+    # Follow turn waypoints
+    WAYPOINT_YAML_PATH = "/home/dev/waypoints/parking_pull_in.yaml"
+    robot.waypoints = robot.read_waypoints(WAYPOINT_YAML_PATH)
+    end_waypoint = robot.waypoints[-1]
 
-estop.enable_dbw()  # Enable vehicle control via ROS - one time message
+    robot.drive_for(
+        speed=1.0,
+        angle=robot.follow_waypoints,
+        angle_kwargs={"radius": 1.5},
+        end_function=robot.waypoint_in_range,
+        end_function_kwargs={"goal_waypoint": end_waypoint, "radius": 1.5},
+        # duration=10,
+    )
 
-# # Pull Out To Right
-actor.print_title("F4.1 Parking Pull Out Right")
+    robot.drive_for(speed=1.0, duration=1.5)
 
-actor.drive_for(speed=1.5, angle=0.0, speed_distance=4.6)
+    robot.stop(duration=0.5)
 
-actor.drive_for(speed=1.5, angle=-30.0, speed_distance=6.0)
+    robot.drive_mode(mode="rotate")
 
-actor.drive_for(speed=1.5, angle=0.0, speed_distance=0.5)
+    robot.drive_for(speed=0.0, angle=0.1, duration=1.0)
+    robot.drive_for(speed=0.0, angle=0.6, duration=1.5)
 
-# actor.drive_for(
-#     speed=1.5, angle=actor.lane_center, end_function=actor.lidar_3d, end_function_kwargs={"max_distance": 3.0}
-# )
+    robot.stop(duration=0.5)
+    
+    robot.drive_mode()
 
-# actor.stop_vehicle(duration=5.0, using_brakes=True)
+    robot.drive_for(speed=1.0, duration=4.0)
 
-# Pull Out To Right
-# actor.print_title("F4.1 Parking PullIn Left")
+    robot.stop(duration=0.5)
 
-# actor.drive_for(speed=1.5, angle=0.0, speed_distance=3.5)
+    robot.print_title("Test Completed")
 
-# actor.drive_for(speed=1.5, angle=28.0, speed_distance=7.2)
+    time.sleep(20)
+    robot.destroy_node()  # DESTROY EVERYTHING!!!!!
 
-# actor.drive_for(speed=1.5, angle=0.0, speed_distance=0.6)
 
-# actor.drive_for(
-#     speed=1.5, angle=actor.lane_center, end_function=actor.lidar_3d, end_function_kwargs={"max_distance": 3.0}
-# )
+# Main Executer (No need to change) -----------------------------------------------------------------------------------
+def main(args=None):  # <<< ROS entry point
+    try:
+        rclpy.init(args=args)
+        script()
+        # rclpy.shutdown()
+    except (ExternalShutdownException, KeyboardInterrupt):
+        pass
 
-actor.stop_vehicle(duration=15.0, using_brakes=True, softness=0.1)
-actor.print_highlights("Parking Pull In Complete!")
+
+if __name__ == "__main__":
+    main()

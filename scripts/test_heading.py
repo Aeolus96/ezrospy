@@ -31,7 +31,7 @@ from modules.ezros_robot import HeadingEstimator, Schoolbus
 # Pass Criteria - vehicle is able to stop before reaching Barrel 3
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-WAYPOINT_YAML_PATH = "/home/dev/waypoints/test_waypoints.yaml"
+WAYPOINT_YAML_PATH = "/home/dev/waypoints/merging.yaml"
 
 
 # Main Script ---------------------------------------------------------------------------------------------------------
@@ -40,18 +40,18 @@ def script():
     robot.print_title("Test Heading")
     robot.waypoints = robot.read_waypoints(WAYPOINT_YAML_PATH)
     # robot.drive_for(speed=1, angle=robot.lane_center, duration=30)
-    
+
     # print(robot.waypoint)
     # print(robot.waypoints[-1])
     end_waypoint = robot.waypoints[-1]
-    
+
     robot.drive_for(
-        speed=0.0,
+        speed=1.0,
         angle=robot.follow_waypoints,
         angle_kwargs={"radius": 1.5},
-        # end_function=robot.waypoint_in_range,
-        # end_function_kwargs={"goal_waypoint": end_waypoint, "radius": 3.0},
-        duration=10,
+        end_function=robot.waypoint_in_range,
+        end_function_kwargs={"goal_waypoint": end_waypoint, "radius": 1.5},
+        # duration=10,
     )
 
     robot.stop()
@@ -59,12 +59,19 @@ def script():
     robot.print_title("Test Completed")
 
 
+    time.sleep(20)
+    robot.destroy_node()  # DESTROY EVERYTHING!!!!!
+
+
 # Main Executer (No need to change) -----------------------------------------------------------------------------------
 def main(args=None):  # <<< ROS entry point
     try:
         rclpy.init(args=args)
         script()
-        rclpy.shutdown()
+        exit(0)
+
+        # rclpy.shutdown()
+
     except (ExternalShutdownException, KeyboardInterrupt):
         pass
 

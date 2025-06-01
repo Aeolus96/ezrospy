@@ -3,95 +3,76 @@
 
 # Test FIV.3. Parking. Parallel
 # 1. Test Goal
-  # This test is intended to evaluate if a vehicle is able to parallel park into the representative parking space. The
-  # direction of parallel parking (to the right or to the left) is selected by the judges. The same direction is repeated for
-  # all 3 attempts.
+# This test is intended to evaluate if a vehicle is able to parallel park into the representative parking space. The
+# direction of parallel parking (to the right or to the left) is selected by the judges. The same direction is repeated for
+# all 3 attempts.
 # 2. Test Setup
-  # The following items shall be placed on the road:
-  # - Barrel 1 to indicate starting point at which vehicle is stationary
+# The following items shall be placed on the road:
+# - Barrel 1 to indicate starting point at which vehicle is stationary
 # 3. Test Script
-  # 1. Begin test run
-  # 2. Judge pushes 'start' button
-  # 3. Vehicle backs off from full stop at Barrel 1
-  # 4. Vehicle slowly pulls into the parking spot
-  # 5. Vehicle reaches full stop. It should be fully in the box without crossing any lines.
-  # 6. End test run
+# 1. Begin test run
+# 2. Judge pushes 'start' button
+# 3. Vehicle backs off from full stop at Barrel 1
+# 4. Vehicle slowly pulls into the parking spot
+# 5. Vehicle reaches full stop. It should be fully in the box without crossing any lines.
+# 6. End test run
 # 4. Evaluation
-  # Fail Criteria – vehicle crosses solid white line
+# Fail Criteria – vehicle crosses solid white line
 
 
-import actor_ros  # ACTor specific utility functions
-import rospy  # ROS Python API
+#!/usr/bin/env python3
+import time  # noqa: F401
 
-estop = actor_ros.actor_tools.EStopManager()  # E-Stop Manager instance
+import rclpy  # type: ignore  # noqa: F401
+from rclpy.executors import ExternalShutdownException  # type: ignore  # noqa: F401
 
-actor = actor_ros.scripting_tools.ActorScriptTools()  # ACTor Scripting Tools instance
-# ^ This starts everything that needs to be up and running for the script
-# ---------------------------------------------------------------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------------------------------
-
-actor.print_title("F4.3 Parallel Parking")
-
-actor.print_highlights("Go Forward")
-
-estop.enable_dbw()  # Enable vehicle control via ROS - one time message
-
-actor.shift_gear("REVERSE")
-
-actor.drive_for(speed=-1.5, angle=0.0, speed_distance=0.1)
-
-actor.drive_for(speed=-1.5, angle=-40.0, speed_distance=1.8)
-actor.drive_for(speed=-1.5, angle=0.0, speed_distance=1.0)
-
-actor.drive_for(speed=-1.0, angle=40.0, speed_distance=3.0)
-actor.stop_vehicle(duration=4.0, using_brakes='True')
-
-actor.shift_gear("DRIVE")
-actor.drive_for(speed=1.0, angle=-40.0, speed_distance=1.2)
-
-# actor.drive_for(speed=-1.2, angle=0.0, speed_distance=0.05)
-
-# reverse until rear barrel is 2m away
-# actor.drive_for(speed=-1.2, angle=0.0, end_function=actor.lidar3d, lidar_zone='rear', max_distance=2)
-# actor.drive_for(speed=-1.2, angle=0.0, end_function=actor.lidar3d,end_function_kwargs={"lidar_zone": 'rear', "max_distance": 2})
+from modules.ezros_robot import Schoolbus
 
 
-actor.stop_vehicle(duration=0.1)
+# Main Script ---------------------------------------------------------------------------------------------------------
+def script():
+    robot = Schoolbus()
+    robot.print_title("Test Left Turn")
 
-actor.stop_vehicle(duration=15.0, using_brakes='True')
+    # Follow turn waypoints
+    WAYPOINT_YAML_PATH = "/home/dev/waypoints/parking_parallel.yaml"
+    robot.waypoints = robot.read_waypoints(WAYPOINT_YAML_PATH)
+    end_waypoint = robot.waypoints[-1]
 
+    robot.drive_for(
+        speed=1.0,
+        angle=robot.follow_waypoints,
+        angle_kwargs={"radius": 1.5},
+        end_function=robot.waypoint_in_range,
+        end_function_kwargs={"goal_waypoint": end_waypoint, "radius": 1.5},
+        # duration=10,
+    )
 
-actor.print_highlights("Parallel Parking Right Complete!")
-#####################################################################
-# Parallel parking Left
-#actor.print_highlights("Go Forward")
+    robot.drive_for(speed=1.0, duration=1.75)
 
-# estop.enable_dbw()  # Enable vehicle control via ROS - one time message
+    robot.stop(duration=1.0)
 
-# actor.shift_gear("REVERSE")
+    robot.drive_mode(mode="heading")
 
-# #actor.drive_for(speed=-1.5, angle=0.0, speed_distance=0.1)
+    robot.drive_for(speed=0.75, angle=-1.57, duration=4.0)
 
-# actor.drive_for(speed=-1.5, angle=40.0, speed_distance=2.4)
-# actor.drive_for(speed=-1.5, angle=0.0, speed_distance=1.0)
+    robot.stop()
 
-# actor.drive_for(speed=-1.0, angle=-40.0, speed_distance=4.0)
-# actor.stop_vehicle(duration=4.0, using_brakes='True')
+    robot.print_title("Test Completed")
 
-# actor.shift_gear("DRIVE")
-# actor.drive_for(speed=1.0, angle=40.0, speed_distance=0.5)
-
-# actor.drive_for(speed=-1.2, angle=0.0, speed_distance=0.05)
-
-#reverse until rear barrel is 2m away
-# actor.drive_for(speed=-1.2, angle=0.0, end_function=actor.lidar3d, lidar_zone='rear', max_distance=2)
-#actor.drive_for(speed=-1.2, angle=0.0, end_function=actor.lidar3d,end_function_kwargs={"lidar_zone": 'rear', "max_distance": 2})
-
-
-# actor.stop_vehicle(duration=0.1)
-
-# actor.stop_vehicle(duration=5.0, using_brakes='True')
+    time.sleep(20)
+    robot.destroy_node()  # DESTROY EVERYTHING!!!!!
 
 
-# actor.print_highlights("Parallel Parking Right Complete!")
+# Main Executer (No need to change) -----------------------------------------------------------------------------------
+def main(args=None):  # <<< ROS entry point
+    try:
+        rclpy.init(args=args)
+        script()
+        # rclpy.shutdown()
+    except (ExternalShutdownException, KeyboardInterrupt):
+        pass
+
+
+if __name__ == "__main__":
+    main()

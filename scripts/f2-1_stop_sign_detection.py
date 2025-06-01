@@ -1,54 +1,65 @@
 #!/usr/bin/env python3
+import time  # noqa: F401
 
+import rclpy  # type: ignore  # noqa: F401
+from rclpy.executors import ExternalShutdownException  # type: ignore  # noqa: F401
 
-# Test FII.1 Stop Sign Detection
+from modules.ezros_robot import HeadingEstimator, Schoolbus
+
+# End of Imports ------------------------------------------------------------------------------------------------------
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Test Q.1 E-Stop Manual
 # 1. Test Goal
-    # This test is intended to evaluate Stop Sign classification detection and accuracy. Any type of
-    # algorithm could be used for this test. Before test, a RANDOM picture might be put on top of a
-    # STOP sign. A forgery sign could be red in color with random letters, be a different color with same
-    # letters, or be a different picture. Examples used in the previous years: “Soup” and “IGVC” signs. A
-    # GUI interface shell display a relevant classification as “Stop Sign” or “Unknown”. There are NO
-    # PENALTIES for crossing or moving over a lane.
+# This test is intended to evaluate safety features of Manual E-Stop.
 # 2. Test Setup
-    # - Barrel 1 to indicate starting point at which vehicle is
-    # stationary 
-    # - 3 different “Stop” signs are being tested
-    # randomly
+# The following items shall be placed on the road:
+# o Barrel 1 on the side of the road to indicate a starting point at which vehicle is stationary
+# o Barrel 2 on the side of the road to indicate the position where E-Stop button is pressed
+# o Barrel 3 on the side of the road to indicate the maxim distance for the vehicle to come to the complete
+# stop. The distance between Barrel 2 and Barrel 3 is 14 feet
 # 3. Test Script
-    # 1. Begin test run
-    # 2. The 1 st judge inside of the vehicle pushes a 'start' button
-    # 3. The extracted sign is shown on the screen with a correct identification
-    # 4. The 2nd judge removes a current sign, and puts a new “stop” sign. It could be a fake or a real sign.
-    # 5. The extracted sign is shown on the screen with a correct identification
-    # 6. The 2nd judge removes a current sign, and puts a new “stop” sign. It could be a fake or a real sign.
-    # 7. End test run
+# 1. Begin test run
+# 2. Judge pushes 'start' button
+# 3. Vehicle takes off from full stop at Barrel 1
+# 4. Vehicle maintains the target speed
+# 5. Judge manually pushes E-Stop at Barrel 2
+# 6. Vehicle comes to full stop before reaching Barrel 3.
+# 7. End test run
 # 4. Evaluation
-    # Fail Criteria – no GUI interface is present during the run, incorrect identification of any of 3 signs,
-    # keyboard touching between the sign changes. To pass the test, all 3 signs must be correctly
-    # identified.
-    # Penalties – no penalties for crossing or moving over the lines, if vehicle is moving during the test
+# Pass Criteria - vehicle is able to stop before reaching Barrel 3
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
-import actor_ros  # ACTor specific utility functions
-import rospy  # ROS Python API
+# Main Script ---------------------------------------------------------------------------------------------------------
+def script():
+    robot = Schoolbus(verbose=True)
+    robot.print_title("Stop Sign Detection")
+    for _ in range(60):
+        robot.yolo_look_for("stop")
+        time.sleep(1)
+        
+    robot.print_title("Test Completed")
 
-estop = actor_ros.actor_tools.EStopManager()  # E-Stop Manager instance
 
-actor = actor_ros.scripting_tools.ActorScriptTools()  # ACTor Scripting Tools instance
-# ^ This starts everything that needs to be up and running for the script
-# ---------------------------------------------------------------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------------------------------
+    time.sleep(20)
+    robot.destroy_node()  # DESTROY EVERYTHING!!!!!
 
-actor.print_title("F2.1 Stop Sign Detection")
 
-actor.print_highlights("Detecting Stop Signs")
+# Main Executer (No need to change) -----------------------------------------------------------------------------------
+def main(args=None):  # <<< ROS entry point
+    try:
+        rclpy.init(args=args)
+        script()
+        exit(0)
 
-count = 0
+        # rclpy.shutdown()
 
-while count < 300:
-    actor.yolo_look_for(stop_sign=True, size=100)
-    count += 1
-    rospy.sleep(0.1)
+    except (ExternalShutdownException, KeyboardInterrupt):
+        pass
 
-actor.print_highlights("Stop Sign Detection Complete!")
+
+if __name__ == "__main__":
+    main()

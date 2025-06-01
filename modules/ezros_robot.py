@@ -10,6 +10,7 @@ from copy import deepcopy
 from math import asin, atan2, cos, degrees, radians, sin, sqrt
 
 import rclpy  # type: ignore  # noqa: F401
+from std_msgs.msg import String
 
 from modules.ezros_tools import EzRosNode, package_path
 
@@ -286,11 +287,14 @@ class Schoolbus(EzRobot):
         latitude = self.msg_gps.latitude
         longitude = self.msg_gps.longitude
         self.waypoint.update(latitude, longitude)  # Update self waypoint
-        self.heading = (((self.msg_imu.orientation.z * -180) + 180) + 330) % 360  # Heading from IMU in degrees
+        # self.heading = (((self.msg_imu.orientation.z * -180) + 180) + 330) % 360  # Heading from IMU in degrees
         # -1 to 1 > 180 to -180 > 0 to 360 > offset to North
-        
+
+        # RelPosNED heading
+        self.heading = self.msg_navrelposned.rel_pos_heading * 1e-5
+
     def lane_center(self, gain: float = 1.0):
-        return self.msg_blob_cmd.angular.z * gain * -1.0
+        return self.msg_blob_cmd.angular.z * gain * -10.0
 
     def yolo_look_for(self, target: str = "person") -> None:
         """Calls the yolo service to look for a specific target class.
@@ -321,7 +325,7 @@ class Schoolbus(EzRobot):
         # within_zone = eval(f"self.msg_{zone}.data > {min_dist} and self.msg_{zone}.data < {max_dist}")
         distance = eval(f"self.msg_{zone}.data")
         within_zone = distance < max_dist and distance > min_dist
-        print(f"Object in {zone}:: {distance} ::{within_zone}")
+        # print(f"Object in {zone}:: {distance} ::{within_zone}")
         return within_zone
 
     def update_current_waypoint(self) -> None:
@@ -386,7 +390,7 @@ class Schoolbus(EzRobot):
 
         num_waypoints = len(self.waypoints)
         # print(f"Waypoints Remaining: {num_waypoints}")
-        print(f"Heading: {self.heading}")
+        # print(f"Heading: {self.heading}")
 
         if num_waypoints > 0:  # If there are waypoints available
             self.update_current_waypoint()  # Update current waypoint position
@@ -405,9 +409,21 @@ class Schoolbus(EzRobot):
                     print("Reached ", self.waypoints[0])
                 self.waypoints.pop(0)  # remove waypoint because it has been sufficiently reached
 
-            return -radians(target_angle)
+            return radians(target_angle)
 
         else:  # If there are no more waypoints in the list
             if verbose:
                 print("--final waypoint reached--")
             return 0
+
+    def drive_mode(self, mode: str = ""):
+        msg = String()
+
+        if mode == "heading":
+            msg.data = mode
+        elif mode == "rotate":
+            msg.data = mode
+        else:
+            msg.data = "ackermann"
+
+        self.pub_drive_mode.publish(msg)

@@ -31,6 +31,10 @@ subs:
     topic: /navheading
     msg_file: sensor_msgs.msg
     msg_type: Imu
+  - name: msg_navrelposned
+    topic: /navrelposned
+    msg_file: ublox_msgs.msg
+    msg_type: NavRELPOSNED9
   - name: msg_front
     topic: /region/front/closest
     msg_file: std_msgs.msg

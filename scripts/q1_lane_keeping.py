@@ -35,11 +35,17 @@ def script():
     robot.print_title("Test Lane Keeping (Go Straight)")
     robot.drive_for(
         speed=1.0,
-        angle=-0.05,
+        angle=robot.lane_center,
         end_function=robot.object_in_zone,
         end_function_kwargs={"zone": "front", "min_dist": 0, "max_dist": 2.1},
     )
+
+    robot.stop()
+
     robot.print_title("Test Completed")
+
+    time.sleep(20)
+    robot.destroy_node()  # DESTROY EVERYTHING!!!!!
 
 
 # Main Executer (No need to change) -----------------------------------------------------------------------------------
@@ -47,7 +53,7 @@ def main(args=None):  # <<< ROS entry point
     try:
         rclpy.init(args=args)
         script()
-        rclpy.shutdown()
+        # rclpy.shutdown()
     except (ExternalShutdownException, KeyboardInterrupt):
         pass
 

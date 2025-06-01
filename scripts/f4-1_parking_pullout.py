@@ -3,60 +3,89 @@
 
 # Test FIV.1 Parking. Pull Out
 # 1. Test Goal
-    # This test is intended to evaluate if a vehicle is able to reverse out (or pull out) of the representative parking space.
-    # The direction of pull out (right-turn-pull-out or left-turn-pull-out) is selected by the judges. The same direction is
-    # repeated for all 3 attempts.
+# This test is intended to evaluate if a vehicle is able to reverse out (or pull out) of the representative parking space.
+# The direction of pull out (right-turn-pull-out or left-turn-pull-out) is selected by the judges. The same direction is
+# repeated for all 3 attempts.
 # 2. Test Setup
-    # The following items shall be placed on the road:
-    # - Barrel 1 to indicate a starting point at which vehicle is stationary
-    # - Barrel 2 to indicate an ending point
+# The following items shall be placed on the road:
+# - Barrel 1 to indicate a starting point at which vehicle is stationary
+# - Barrel 2 to indicate an ending point
 # 3. Test Script
-    # 1. Begin test run
-    # 2. Judge pushes 'start' button
-    # 3. Vehicle takes off from full stop at Barrel 1
-    # 4. Vehicle slowly pulls out from the parking spot
-    # 5. Vehicle reaches full stop within 3 ft from the Barrel 2
-    # 6. End test run
+# 1. Begin test run
+# 2. Judge pushes 'start' button
+# 3. Vehicle takes off from full stop at Barrel 1
+# 4. Vehicle slowly pulls out from the parking spot
+# 5. Vehicle reaches full stop within 3 ft from the Barrel 2
+# 6. End test run
 # 4. Evaluation
-    # Fail Criteria – vehicle crosses solid white lines
-    # Penalties – hits barrel at the end of the run (25 points), stops further than 3 ft from the barrel (10 points)
+# Fail Criteria – vehicle crosses solid white lines
+# Penalties – hits barrel at the end of the run (25 points), stops further than 3 ft from the barrel (10 points)
+
+#!/usr/bin/env python3
+import time  # noqa: F401
+
+import rclpy  # type: ignore  # noqa: F401
+from rclpy.executors import ExternalShutdownException  # type: ignore  # noqa: F401
+
+from modules.ezros_robot import Schoolbus
 
 
-import actor_ros  # ACTor specific utility functions
-import rospy  # ROS Python API
+# Main Script ---------------------------------------------------------------------------------------------------------
+def script():
+    robot = Schoolbus()
+    robot.print_title("Test Left Turn")
 
-estop = actor_ros.actor_tools.EStopManager()  # E-Stop Manager instance
+    # Follow turn waypoints
+    # WAYPOINT_YAML_PATH = "/home/dev/waypoints/parking_pull_out.yaml"
+    # robot.waypoints = robot.read_waypoints(WAYPOINT_YAML_PATH)
+    # end_waypoint = robot.waypoints[-1]
 
-actor = actor_ros.scripting_tools.ActorScriptTools()  # ACTor Scripting Tools instance
-# ^ This starts everything that needs to be up and running for the script
-# ---------------------------------------------------------------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------------------------------
+    # robot.drive_for(
+    #     speed=1.0,
+    #     angle=robot.follow_waypoints,
+    #     angle_kwargs={"radius": 1.5},
+    #     end_function=robot.waypoint_in_range,
+    #     end_function_kwargs={"goal_waypoint": end_waypoint, "radius": 1.5},
+    #     # duration=10,
+    # )
 
-estop.enable_dbw()  # Enable vehicle control via ROS - one time message
-# Pull Out To Right
-# actor.print_title("F4.1 Parking Pull Out Right")
+    robot.drive_for(speed=1.0, duration=5.5)
 
-# actor.drive_for(speed=1.5, angle=0.0, speed_distance=0.75)
+    robot.stop(duration=0.5)
 
-# actor.drive_for(speed=3.0, angle=-35.0, speed_distance=6.0)
+    robot.drive_mode(mode="rotate")
 
-# actor.drive_for(
-#     speed=1.5, angle=actor.lane_center, end_function=actor.lidar_3d, end_function_kwargs={"max_distance": 3.0}
-# )
+    robot.drive_for(speed=0.0, angle=-0.1, duration=1.0)
+    robot.drive_for(speed=0.0, angle=-0.6, duration=1.8)
 
-# actor.stop_vehicle(duration=5.0, using_brakes=True)
+    robot.stop(duration=0.5)
 
-actor.print_title("F4.1 Parking Pull Out Left")
+    robot.drive_mode()
 
-actor.drive_for(speed=2.0, angle=0.0, speed_distance=2.0)
+    robot.drive_for(
+        speed=1.0,
+        angle=0.05,
+        end_function=robot.object_in_zone,
+        end_function_kwargs={"zone": "front", "min_dist": 0, "max_dist": 2.1},
+    )
 
-actor.drive_for(speed=3.0, angle=27.0, speed_distance=6.5)
+    robot.stop(duration=0.5)
 
-actor.drive_for(
-    speed=1.5, angle=0.0, end_function=actor.lidar_3d, end_function_kwargs={"max_distance": 3.0}
-)
+    robot.print_title("Test Completed")
 
-actor.stop_vehicle(duration=15.0, using_brakes=True)
+    time.sleep(20)
+    robot.destroy_node()  # DESTROY EVERYTHING!!!!!
 
-actor.print_highlights("Parking Pull Out Complete!")
+
+# Main Executer (No need to change) -----------------------------------------------------------------------------------
+def main(args=None):  # <<< ROS entry point
+    try:
+        rclpy.init(args=args)
+        script()
+        # rclpy.shutdown()
+    except (ExternalShutdownException, KeyboardInterrupt):
+        pass
+
+
+if __name__ == "__main__":
+    main()
