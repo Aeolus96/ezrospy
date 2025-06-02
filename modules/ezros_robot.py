@@ -328,6 +328,9 @@ class Schoolbus(EzRobot):
         # print(f"Object in {zone}:: {distance} ::{within_zone}")
         return within_zone
 
+    def object_not_in_zone(self, zone: str, min_dist: float = 0.0, max_dist: float = 5.0) -> bool:
+        return not self.object_in_zone(zone=zone, min_dist=min_dist, max_dist=max_dist)
+
     def update_current_waypoint(self) -> None:
         """Updates self Waypoint instance from the current vehicle status"""
 
@@ -418,12 +421,89 @@ class Schoolbus(EzRobot):
 
     def drive_mode(self, mode: str = ""):
         msg = String()
+        print(f"Switching to {mode} mode")
 
         if mode == "heading":
-            msg.data = mode
+            msg.data = "heading"
         elif mode == "rotate":
-            msg.data = mode
+            msg.data = "rotate"
         else:
+            print("Switching to ackermann mode")
             msg.data = "ackermann"
 
-        self.pub_drive_mode.publish(msg)
+        for i in range(20):
+            self.pub_drive_mode.publish(msg)
+
+    def detect_pothole(self, size: float = 5.0):
+        # print(self.msg_pothole.data)
+        if self.msg_pothole.data > size:
+            print("Pothole detected")
+            return True
+        return False
+
+    def lane_change_left(self, heading: bool = False):
+        if heading:
+            self.stop(duration=1.5)
+            self.drive_mode(mode="heading")
+            self.drive_for(speed=0.1, angle=1.0, duration=1.0)
+            self.drive_for(speed=0.75, angle=1.0, duration=6.5)
+            self.drive_mode()
+            self.stop(duration=1.0)
+        else:
+            self.drive_for(speed=1.0, angle=0.6, duration=1.2)
+            self.drive_for(speed=1.0, angle=0.0, duration=5.0)
+            self.drive_for(speed=1.0, angle=-0.6, duration=1.0)
+
+    def lane_change_right(self, heading: bool = False):
+        if heading:
+            self.stop(duration=1.5)
+            self.drive_mode(mode="heading")
+            self.drive_for(speed=0.1, angle=-1.0, duration=1.0)
+            self.drive_for(speed=0.75, angle=-1.0, duration=6.5)
+            self.drive_mode()
+            self.stop(duration=1.0)
+        else:
+            self.drive_for(speed=1.0, angle=-0.6, duration=0.9)
+            self.drive_for(speed=1.0, angle=0.0, duration=4.5)
+            self.drive_for(speed=1.0, angle=0.6, duration=1.0)
+
+    def stop_rotate(self):
+        self.stop(duration=1.0)
+        self.drive_mode(mode="rotate")
+        self.drive_for(speed=0.01, angle=0.001, duration=10.0)
+        self.drive_mode()
+
+    def load_new_waypoints(self, file_name):
+        self.waypoints = self.read_waypoints(f"/home/dev/waypoints/{file_name}.yaml")
+
+    def detect_tire(self, size: float = 0.5):
+        self.yolo_look_for(target="tire")
+        print(f"looking for tire, {self.yolo_size}")
+        time.sleep(0.2)
+        return self.yolo_size > size
+
+    def check_fake_sign(
+        self,
+        goal_waypoint: "Waypoint" = None,
+        zone: str = "frontright",
+        min_dist: float = 0.0,
+        max_dist: float = 5.0,
+    ) -> bool:
+        """Returns True if object is in zone, False otherwise"""
+
+        # within_zone = eval(f"self.msg_{zone}.data > {min_dist} and self.msg_{zone}.data < {max_dist}")
+        distance = eval(f"self.msg_{zone}.data")
+        within_zone = distance < max_dist and distance > min_dist
+        # print(f"Object in {zone}:: {distance} ::{within_zone}")
+
+        self.yolo_look_for("stop")
+
+        if not self.found_sign:
+            self.found_sign = self.yolo_count > 0
+
+        if self.found_sign and within_zone:
+            return True
+
+        if self.waypoint_in_range(goal_waypoint=goal_waypoint):
+            self.end_condition = True
+            return True

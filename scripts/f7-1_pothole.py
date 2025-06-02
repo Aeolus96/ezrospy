@@ -1,59 +1,83 @@
 #!/usr/bin/env python3
 
 
+# Test FIV.3. Parking. Parallel
 # 1. Test Goal
-  # This test is intended to evaluate Ego vehicle’s ability to detect a pothole and safely change lane.
+# This test is intended to evaluate if a vehicle is able to parallel park into the representative parking space. The
+# direction of parallel parking (to the right or to the left) is selected by the judges. The same direction is repeated for
+# all 3 attempts.
 # 2. Test Setup
-  # The following items shall be placed on the road:
-  # - Barrel 1 to indicate a starting point at which vehicle is
-  # stationary 
-  # - Pothole (2 feet diameter solid white circle or
-  # plastic mirror) 
-  # - Barrel 2 to indicate an ending point
+# The following items shall be placed on the road:
+# - Barrel 1 to indicate starting point at which vehicle is stationary
 # 3. Test Script
-  # 1. Begin test run
-  # 2. Judge pushes 'start' button
-  # 3. Vehicle takes off from full stop at Barrel 1
-  # 4. Vehicle maintains the target speed (between 4 – 5 mph)
-  # 5. Vehicle detects pothole and safely moves into the next lane
-  # 6. Vehicle maintains the target speed in the new lane (between 4 – 5 mph)
-  # 7. Vehicle reaches full stop within 3 ft from the Barrel 2
-  # 8. End test run
+# 1. Begin test run
+# 2. Judge pushes 'start' button
+# 3. Vehicle backs off from full stop at Barrel 1
+# 4. Vehicle slowly pulls into the parking spot
+# 5. Vehicle reaches full stop. It should be fully in the box without crossing any lines.
+# 6. End test run
 # 4. Evaluation
-  # Fail Criteria – run over the pothole
-  # Penalties - hits barrel at the end of the run (25 points), stops further or closer than 3 ft to the Barrel
-  # 2 (10 points)
+# Fail Criteria – vehicle crosses solid white line
 
 
-import actor_ros  # ACTor specific utility functions
-import rospy  # ROS Python API
+#!/usr/bin/env python3
+import time  # noqa: F401
 
-estop = actor_ros.actor_tools.EStopManager()  # E-Stop Manager instance
+import rclpy  # type: ignore  # noqa: F401
+from rclpy.executors import ExternalShutdownException  # type: ignore  # noqa: F401
 
-actor = actor_ros.scripting_tools.ActorScriptTools()  # ACTor Scripting Tools instance
-# ^ This starts everything that needs to be up and running for the script
-# ---------------------------------------------------------------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------------------------------
+from modules.ezros_robot import Schoolbus
 
-# TODO: Add your code from here
 
-actor.print_title("F7.1 Pothole Detection")
+# Main Script ---------------------------------------------------------------------------------------------------------
+def script():
+    robot = Schoolbus()
+    robot.print_title("Pothole")
 
-actor.print_highlights("Go Forward")
+    # Follow turn waypoints
+    WAYPOINT_YAML_PATH = "/home/dev/waypoints/pothole.yaml"
+    robot.waypoints = robot.read_waypoints(WAYPOINT_YAML_PATH)
+    # end_waypoint = robot.waypoints[-1]
 
-estop.enable_dbw()  # Enable vehicle control via ROS - one time message
+    robot.drive_for(
+        speed=1.0,
+        angle=robot.follow_waypoints,
+        angle_kwargs={"radius": 1.5},
+        end_function=robot.detect_pothole,
+        end_function_kwargs={"size": 5.0},
+        # duration=10,
+    )
 
-actor.drive_for(speed=1, angle=actor.lane_center, end_function=actor.yolo_look_for("pothole", 100))
+    robot.lane_change_left()
 
-actor.drive_for(speed=1, angle=1, speed_distance=3)
+    WAYPOINT_YAML_PATH = "/home/dev/waypoints/pothole_barrel.yaml"
+    robot.waypoints = robot.read_waypoints(WAYPOINT_YAML_PATH)
 
-actor.drive_for(speed=1, angle=-1, speed_distance=5)
+    robot.drive_for(
+        speed=1.0,
+        angle=robot.follow_waypoints,
+        angle_kwargs={"radius": 1.5},
+        end_function=robot.object_in_zone,
+        end_function_kwargs={"zone": "front", "min_dist": 0, "max_dist": 2.3},
+    )
 
-actor.drive_for(speed=1, angle=1, speed_distance=2)
+    robot.stop_rotate()
 
-actor.drive_for(speed=1, angle=actor.lane_center, end_function=actor.lidar_detect(lidar_zone=0, max_distance=3.0))
+    robot.print_title("Test Completed")
 
-actor.stop_vehicle(duration=5.0)
+    time.sleep(10)
+    robot.destroy_node()  # DESTROY EVERYTHING!!!!!
 
-actor.print_highlights("Pothole Complete!")
+
+# Main Executer (No need to change) -----------------------------------------------------------------------------------
+def main(args=None):  # <<< ROS entry point
+    try:
+        rclpy.init(args=args)
+        script()
+        # rclpy.shutdown()
+    except (ExternalShutdownException, KeyboardInterrupt):
+        pass
+
+
+if __name__ == "__main__":
+    main()

@@ -40,7 +40,7 @@ def script():
     robot.drive_for(
         speed=0.7,
         angle=robot.follow_waypoints,
-        angle_kwargs={"radius": 1.2},
+        angle_kwargs={"radius": 1.5},
         end_function=robot.object_in_zone,
         end_function_kwargs={"zone": "frontright", "min_dist": 0, "max_dist": 5.0},
     )
@@ -50,9 +50,9 @@ def script():
     robot.drive_for(
         speed=1.3,
         angle=robot.follow_waypoints,
-        angle_kwargs={"radius": 1.2},
+        angle_kwargs={"radius": 1.5},
         end_function=robot.object_in_zone,
-        end_function_kwargs={"zone": "front", "min_dist": 0, "max_dist": 2.1},
+        end_function_kwargs={"zone": "front", "min_dist": 0, "max_dist": 2.0},
     )
 
     robot.stop(duration=5.0)

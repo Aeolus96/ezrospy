@@ -51,6 +51,10 @@ subs:
     topic: /region/rear/closest
     msg_file: std_msgs.msg
     msg_type: Float32
+  - name: msg_pothole
+    topic: /pothole/detection
+    msg_file: std_msgs.msg
+    msg_type: Float32
 
 service_calls: # ROS Service calls
   - name: srv_yolo # Name of client. Request is this name + _req

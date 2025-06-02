@@ -38,7 +38,7 @@ def script():
     robot.waypoints = robot.read_waypoints(WAYPOINT_YAML_PATH)
 
     robot.drive_for(
-        speed=1.5,
+        speed=1.15,
         angle=robot.follow_waypoints,
         angle_kwargs={"radius": 1.5},
         end_function=robot.object_in_zone,
@@ -48,11 +48,11 @@ def script():
     robot.stop(duration=5.0)
 
     robot.drive_for(
-        speed=1.0,
+        speed=1.4,
         angle=robot.follow_waypoints,
         angle_kwargs={"radius": 1.5},
         end_function=robot.object_in_zone,
-        end_function_kwargs={"zone": "front", "min_dist": 0, "max_dist": 2.1},
+        end_function_kwargs={"zone": "front", "min_dist": 0, "max_dist": 2.0},
         # duration=10,
     )
 

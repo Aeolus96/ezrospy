@@ -48,11 +48,11 @@ def script():
     robot.stop(duration=5.0)
 
     robot.drive_for(
-        speed=1.0,
+        speed=1.2,
         angle=robot.follow_waypoints,
-        angle_kwargs={"radius": 1.5},
+        angle_kwargs={"radius": 1.2},
         end_function=robot.object_in_zone,
-        end_function_kwargs={"zone": "front", "min_dist": 0, "max_dist": 2.1},
+        end_function_kwargs={"zone": "front", "min_dist": 0, "max_dist": 1.8},
     )
 
     robot.stop(duration=5.0)

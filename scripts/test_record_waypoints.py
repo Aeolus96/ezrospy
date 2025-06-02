@@ -33,8 +33,8 @@ from modules.ezros_tools import YAMLReader
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-RECORD_DURATION = 25
-WAYPOINT_YAML_PATH = "/home/dev/waypoints/N_FE_intersection_right.yaml"
+RECORD_DURATION = 30
+WAYPOINT_YAML_PATH = "/home/dev/waypoints/main_S_right_turn_W.yaml"
 
 
 # Main Script ---------------------------------------------------------------------------------------------------------
