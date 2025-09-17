@@ -421,18 +421,24 @@ class Schoolbus(EzRobot):
 
     def drive_mode(self, mode: str = ""):
         msg = String()
-        print(f"Switching to {mode} mode")
 
         if mode == "heading":
-            msg.data = "heading"
+            msg.data = mode
         elif mode == "rotate":
-            msg.data = "rotate"
+            msg.data = mode
         else:
-            print("Switching to ackermann mode")
+            mode = "ackermann"
             msg.data = "ackermann"
 
-        for i in range(20):
+        print(f"Switching to {mode} mode")
+
+        while self.msg_drive_mode.data != mode:
             self.pub_drive_mode.publish(msg)
+            self.stop()
+            time.sleep(0.1)
+
+        for i in range(1000):
+            self.stop()
 
     def detect_pothole(self, size: float = 5.0):
         # print(self.msg_pothole.data)
@@ -450,9 +456,15 @@ class Schoolbus(EzRobot):
             self.drive_mode()
             self.stop(duration=1.0)
         else:
-            self.drive_for(speed=1.0, angle=0.6, duration=1.2)
-            self.drive_for(speed=1.0, angle=0.0, duration=5.0)
-            self.drive_for(speed=1.0, angle=-0.6, duration=1.0)
+            self.stop(duration=1.0)
+            self.drive_for(speed=0.0, angle=0.75, duration=2.0)
+            self.drive_for(speed=1.0, angle=0.75, duration=2.0)
+            self.stop(duration=1.0)
+            self.drive_for(speed=1.0, angle=0.0, duration=4.0)
+            self.stop(duration=1.0)
+            self.drive_for(speed=0.0, angle=-0.75, duration=1.5)
+            self.drive_for(speed=1.0, angle=-0.75, duration=1.5)
+            self.stop(duration=2.0)
 
     def lane_change_right(self, heading: bool = False):
         if heading:
@@ -463,15 +475,20 @@ class Schoolbus(EzRobot):
             self.drive_mode()
             self.stop(duration=1.0)
         else:
-            self.drive_for(speed=1.0, angle=-0.6, duration=0.9)
-            self.drive_for(speed=1.0, angle=0.0, duration=4.5)
-            self.drive_for(speed=1.0, angle=0.6, duration=1.0)
+            self.stop(duration=1.0)
+            self.drive_for(speed=0.0, angle=-0.75, duration=2.0)
+            self.drive_for(speed=1.0, angle=-0.75, duration=2.0)
+            self.stop(duration=1.0)
+            self.drive_for(speed=1.0, angle=0.0, duration=4.0)
+            self.stop(duration=1.0)
+            self.drive_for(speed=0.0, angle=0.75, duration=1.5)
+            self.drive_for(speed=1.0, angle=0.75, duration=1.5)
+            self.stop(duration=2.0)
 
     def stop_rotate(self):
         self.stop(duration=1.0)
         self.drive_mode(mode="rotate")
-        self.drive_for(speed=0.01, angle=0.001, duration=10.0)
-        self.drive_mode()
+        self.stop(duration=1.0)
 
     def load_new_waypoints(self, file_name):
         self.waypoints = self.read_waypoints(f"/home/dev/waypoints/{file_name}.yaml")
@@ -479,13 +496,13 @@ class Schoolbus(EzRobot):
     def detect_tire(self, size: float = 0.5):
         self.yolo_look_for(target="tire")
         print(f"looking for tire, {self.yolo_size}")
-        time.sleep(0.2)
+        time.sleep(0.1)
         return self.yolo_size > size
 
     def check_fake_sign(
         self,
         goal_waypoint: "Waypoint" = None,
-        zone: str = "frontright",
+        zone: str = "frontleft",
         min_dist: float = 0.0,
         max_dist: float = 5.0,
     ) -> bool:

@@ -55,6 +55,10 @@ subs:
     topic: /pothole/detection
     msg_file: std_msgs.msg
     msg_type: Float32
+  - name: msg_drive_mode
+    topic: /control/drive_mode
+    msg_file: std_msgs.msg
+    msg_type: String
 
 service_calls: # ROS Service calls
   - name: srv_yolo # Name of client. Request is this name + _req
